@@ -28,6 +28,49 @@ drawBoard(X):- drawTopIndexes(12), nl, write('|---|---|---|---|---|---|---|---|-
 drawTopIndexes(0):- nl, write('| '), write(0), write(' | ').
 drawTopIndexes(X):- NextX is X -1, drawTopIndexes(NextX), write(X), ((X < 10, write(' | ')); write('| ')).
 
+
+preencherTabuleiro(Tab,NewTab):-
+	X is 2,
+	Y is 1,	
+	preencherTabuleiroAux(Tab,NewTab,X,Y).
+
+preencherTabuleiroAux(Tab,Tab,CurrX,CurrY):-
+		boardSize(BoardSize).
+		CurrX>BoardSize.
+
+preencherTabuleiroAux(Tab,Tab,CurrX,CurrY):-
+		boardSize(BoardSize).
+		CurrY>BoardSize,
+		
+		
+preencherTabuleiroAux(Tab,NewTab,CurrX,CurrY):-
+	preencheDiagonal(Tab, X, Y, NewTab1),
+	baixoDireita(X,Y,NewX,NewY),
+	preencheDiagonal(Tab, X, Y, NewTab2),
+	direitaBaixo(X,Y,CurrX,CurrY),
+	preencherTabuleiroAux(NewTab2,NewTab,CurrX,CurrY).
+	
+
+preencheDiagonal(Tab, X, Y, Tab):-
+		boardSize(BoardSize).
+		X>BoardSize.
+
+preencheDiagonal(Tab, X, Y, Tab):-
+		Y<0.
+		
+preencheDiagonal(Tab, InitalX, InitalY, NewTab):-
+	X is InitalX + 3,
+	Y is InitalY - 1,
+	setPecaLinha(NewPeca, [X | Resto1], [X | Resto2], NCol, Peca):
+
+baixoDireita(X,Y,NewX,NewY):-
+
+direitaBaixo(X,Y,NewX,NewY):-
+	
+
+
+
+
 start:- repeat,
 		clear,
 		write('ALWAYS INSERT \'.\' AFTER EACH COMAND'),nl,nl,
