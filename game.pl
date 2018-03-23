@@ -5,16 +5,31 @@ player1('X').
 player2('O').
 emptySpace(' ').
 boardSize(12).
+firstPosition(2).
+secondPosition(4).
 
 peca_oposta(Peca, NewPeca):- player1(P1), player2(P2), ((Peca == P1, NewPeca = P2);(Peca == P2, NewPeca = P1)).
 
-seeList([], 0, _).
-seeList([X| Resto], Nc, InitialIdx):- NewInitialIdx is InitialIdx + 1, X = ' ', Nc > 0, NewNc is Nc-1, seeList(Resto, NewNc, NewInitialIdx).
+seeList([], Nc, _, _, _):- boardSize(Nc).
+seeList([X| Resto], Nc, Peca, Counter ,InitialIdx):-  boardSize(BoardSize), Nc < BoardSize,
+											((Nc < InitialIdx, Y = ' ', NewPeca = Peca); 
+											(Nc == InitialIdx, Y = Peca, peca_oposta(Peca, NewPeca)); 
+											(AuxNc is Nc - InitialIdx, 0 is (AuxNc mod 5), Y = Peca, peca_oposta(Peca, NewPeca));
+											(Y = ' ', NewPeca = Peca)),
+											NewCounter is Counter + 1, X = Y, NewNc is Nc + 1, 
+											seeList(Resto, NewNc, NewPeca, NewCounter, InitialIdx).
 
-getState([], 0, _).
-getState([X | Resto] , Nl, Nc, I, E):- NewI is I -1, Nl > 0, NewNl is Nl-1, getState(Resto, NewNl, Nc), seeList(X, Nc).
+getState([], 0, _, _, _, _, _).
+getState([X | Resto] , Nl, Nc, I, E, PecaX, PecaO):- Nl > 0,
+										((0 is (Nl mod 2), NewE = E, NewPecaO = PecaO, AuxI is I -1, ((AuxI < 0, NewI = 4); NewI= AuxI),
+											((NewIPlus is NewI +1, NewIPlus >= 5, NewPecaX = PecaX); peca_oposta(PecaX, NewPecaX)));
+										(NewI = I, NewPecaX = PecaX, AuxE is E -1, ((AuxE < 0, NewE = 4); NewE = AuxE), 
+											((NewEPlus is NewE +1, NewEPlus >= 5, NewPecaO = PecaO); peca_oposta(PecaO, NewPecaO)))),
+										((0 is (Nl mod 2), seeList(X, Nc, NewPecaO, NewI, NewI));(seeList(X, Nc, NewPecaX, NewE, NewE))),
+										NewNl is Nl - 1, 
+										getState(Resto, NewNl, Nc, NewI, NewE, NewPecaX, NewPecaO).
 
-firstState(Board):- boardSize(BoardSize), getState(Board, BoardSize, BoardSize).
+firstState(Board):- boardSize(BoardSize), player1(NewPecaX), player2(NewPecaO), firstPosition(I),  secondPosition(E), getState(Board, BoardSize, 0, I, E, NewPecaX, NewPecaO).
 
 drawBoardAux([], _).
 drawBoardAux([Y | Ys], X):-  NextX is X+1, write('| '), write(X), ((X < 10, write(' |')); write('|')),
@@ -39,11 +54,11 @@ start:- repeat,
 		(write('Invalid option please try again.'), nl, nl)),
 		fail.
 	
-who_starts(Peca):- clear, nl, write('ALWAYS INSERT \'.\' AFTER EACH COMAND'), nl, nl, 
+who_starts(Peca):- nl, write('ALWAYS INSERT \'.\' AFTER EACH COMAND'), nl, nl, 
 			 repeat,
 			 write('Who\'s starting?(\'X\' or \'O\')'), nl, 
 			 read(X), get_char(_),
-			 clear,
+			 
 			 ((X == 'x', Peca = 'X'); (X == 'X', Peca = 'X');(X == 'o', Peca = 'O'); (X == 'O' , Peca = 'O'); 
 			 (X \== 'x', X \== 'X', X \== 'o', X \== 'O', nl, write('Warning: Please enter \'X\' or \'O\'!'),nl,nl,fail)).
 			
@@ -83,7 +98,6 @@ ask_coordinates(X,Y):-  nl, write('Turn: '), nl, write('Enter Coordinates:'), nl
 						repeat,
 						write('X:'), read(X), get_char(_), 
 						write('Y:'), read(Y), get_char(_), 
-						clear,
 						boardSize(Limit),
 						LimitPlus is Limit +1,
 						X < LimitPlus , X > 0,
