@@ -19,17 +19,21 @@ seeList([X| Resto], Nc, Peca, Counter ,InitialIdx):-  boardSize(BoardSize), Nc <
 											NewCounter is Counter + 1, X = Y, NewNc is Nc + 1, 
 											seeList(Resto, NewNc, NewPeca, NewCounter, InitialIdx).
 
-getState([], 0, _, _, _, _, _).
-getState([X | Resto] , Nl, Nc, I, E, PecaX, PecaO):- Nl > 0,
-										((0 is (Nl mod 2), NewE = E, NewPecaO = PecaO, AuxI is I -1, ((AuxI < 0, NewI = 4); NewI= AuxI),
-											((NewIPlus is NewI +1, NewIPlus >= 5, NewPecaX = PecaX); peca_oposta(PecaX, NewPecaX)));
-										(NewI = I, NewPecaX = PecaX, AuxE is E -1, ((AuxE < 0, NewE = 4); NewE = AuxE), 
-											((NewEPlus is NewE +1, NewEPlus >= 5, NewPecaO = PecaO); peca_oposta(PecaO, NewPecaO)))),
-										((0 is (Nl mod 2), seeList(X, Nc, NewPecaO, NewI, NewI));(seeList(X, Nc, NewPecaX, NewE, NewE))),
+getState([], 0, _, _, _, _).
+getState([X | Resto] , Nl, Nc, I, E, Peca):- Nl > 0, write(I), write('-'), write(E),
+										((0 is (Nl mod 2), NewE = E, AuxI is I -1, ((AuxI < 0, NewI = 4); NewI= AuxI)
+											,((E > I, peca_oposta(Peca, NewPeca));(Peca = NewPeca))
+											%,((NewIPlus is NewI +1, NewIPlus < 5, NewPecaX = PecaX); peca_oposta(PecaX, NewPecaX))
+											);
+										(NewI = I, AuxE is E -1, ((AuxE < 0, NewE = 4); NewE = AuxE) 
+											,((E < I, peca_oposta(Peca, NewPeca));(Peca = NewPeca))
+											%,((NewEPlus is NewE +1, NewEPlus < 5, NewPecaO = PecaO); peca_oposta(PecaO, NewPecaO))
+											)),
+										((0 is (Nl mod 2), seeList(X, Nc, Peca, NewI, NewI));(seeList(X, Nc, Peca, NewE, NewE))),
 										NewNl is Nl - 1, 
-										getState(Resto, NewNl, Nc, NewI, NewE, NewPecaX, NewPecaO).
+										getState(Resto, NewNl, Nc, NewI, NewE, NewPeca).
 
-firstState(Board):- boardSize(BoardSize), player1(NewPecaX), player2(NewPecaO), firstPosition(I),  secondPosition(E), getState(Board, BoardSize, 0, I, E, NewPecaX, NewPecaO).
+firstState(Board):- boardSize(BoardSize), player1(NewPeca),firstPosition(I),  secondPosition(E), getState(Board, BoardSize, 0, I, E, NewPeca).
 
 drawBoardAux([], _).
 drawBoardAux([Y | Ys], X):-  NextX is X+1, write('| '), write(X), ((X < 10, write(' |')); write('|')),
