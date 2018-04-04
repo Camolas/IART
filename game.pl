@@ -1,12 +1,39 @@
 :- use_module(library(random)).
 :- use_module(library(lists)).
+:- include('tui2.pl').
 
+
+pieceX('X').
+pieceO('O').
 player1('X').
 player2('O').
 emptySpace(' ').
 boardSize(12).
 firstPosition(2).
 secondPosition(4).
+
+retMat3x3(X,Y,Mat):-
+	boardSize(X),
+	%if X = sizeMat, 
+		%last row empty
+		%get first row
+		
+	%if X = 0, 
+		%first row empty
+		%get last row
+	%if Y = sizeMat, 
+		%last column empty
+		%get first column
+		
+	%if Y = 0, first row empty
+		%first column empty
+		%get last column
+
+checkValid([Linha|Resto],X,Y,Peca):-
+.
+%getPeca(X,Linha,Peca).
+
+
 
 peca_oposta(Peca, NewPeca):- player1(P1), player2(P2), ((Peca == P1, NewPeca = P2);(Peca == P2, NewPeca = P1)).
 
@@ -38,33 +65,38 @@ firstState(Board):- boardSize(BoardSize), player1(NewPeca),firstPosition(I),  se
 drawBoardAux([], _).
 drawBoardAux([Y | Ys], X):-  NextX is X+1, write('| '), write(X), ((X < 10, write(' |')); write('|')),
 						 drawLine(Y), nl , drawBoardAux(Ys, NextX).
-drawLine([]):- nl,  write('|---|---|---|---|---|---|---|---|---|---|---|---|---|').
+drawLine([]):- nl,  write('|---+---+---+---+---+---+---+---+---+---+---+---+---|').
 drawLine([X | Xs]):- write(' '), write(X) , write(' |'), drawLine(Xs).
 
 
-drawBoard(X):- drawTopIndexes(12), nl, write('|---|---|---|---|---|---|---|---|---|---|---|---|---|'), nl,  drawBoardAux(X, 1).
+drawBoard2(X):- drawTopIndexes(12), nl, write('|---|---|---|---|---|---|---|---|---|---|---|---|---|'), nl,  drawBoardAux(X, 1).
 
 drawTopIndexes(0):- nl, write('| '), write(0), write(' | ').
 drawTopIndexes(X):- NextX is X -1, drawTopIndexes(NextX), write(X), ((X < 10, write(' | ')); write('| ')).
 
-start:- repeat,
-		clear,
-		write('ALWAYS INSERT \'.\' AFTER EACH COMAND'),nl,nl,
-		write('Choose game mode:'), nl,nl,
-		write('1 - PvP (Player vs Player)'),nl,
-		write('Enter Option: '),
-		read(Option), get_char(_), write('asdasdasd'),
-		((Option == 1, pvp);
-		(write('Invalid option please try again.'), nl, nl)),
-		fail.
+
+
+
+
+start:- 
+	mainMenu.
 	
-who_starts(Peca):- nl, write('ALWAYS INSERT \'.\' AFTER EACH COMAND'), nl, nl, 
+who_starts(Peca):- 
 			 repeat,
 			 write('Who\'s starting?(\'X\' or \'O\')'), nl, 
-			 read(X), get_char(_),
-			 
-			 ((X == 'x', Peca = 'X'); (X == 'X', Peca = 'X');(X == 'o', Peca = 'O'); (X == 'O' , Peca = 'O'); 
-			 (X \== 'x', X \== 'X', X \== 'o', X \== 'O', nl, write('Warning: Please enter \'X\' or \'O\'!'),nl,nl,fail)).
+			 write('1. \'X\''), nl,
+			 write('2. \'O\''), nl,
+			 getInt(Input),
+			 (
+				(Input == 1, pieceX(Peca));
+				(Input == 2, pieceO(Peca));
+				
+				nl, write('Error: invalid input.'), nl, nl,
+				fail
+				%pressEnterToContinue, nl,
+				%gameModeMenu
+			),
+			cls.
 			
 		
 pvp:-   who_starts(Starter_Peca),
@@ -100,8 +132,8 @@ player_play(Peca, Board, RulesAppliedBoard):- ask_coordinates(X,Y),
 		
 ask_coordinates(X,Y):-  nl, write('Turn: '), nl, write('Enter Coordinates:'), nl,  
 						repeat,
-						write('X:'), read(X), get_char(_), 
-						write('Y:'), read(Y), get_char(_), 
+						write('X:'), getInt(X), 
+						write('Y:'), getInt(Y), 
 						boardSize(Limit),
 						LimitPlus is Limit +1,
 						X < LimitPlus , X > 0,
