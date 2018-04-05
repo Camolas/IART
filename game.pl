@@ -22,14 +22,12 @@ seeList([X| Resto], Nc, Peca, Counter ,InitialIdx):-  boardSize(BoardSize), Nc <
 getState([], 0, _, _, _, _).
 getState([X | Resto] , Nl, Nc, I, E, Peca):- Nl > 0, write(I), write('-'), write(E),
 										((0 is (Nl mod 2), NewE = E, AuxI is I -1, ((AuxI < 0, NewI = 4); NewI= AuxI)
-											,((E > I, peca_oposta(Peca, NewPeca));(Peca = NewPeca))
-											%,((NewIPlus is NewI +1, NewIPlus < 5, NewPecaX = PecaX); peca_oposta(PecaX, NewPecaX))
+											,((E < NewI, peca_oposta(Peca, NewPeca));(Peca = NewPeca))
 											);
 										(NewI = I, AuxE is E -1, ((AuxE < 0, NewE = 4); NewE = AuxE) 
-											,((E < I, peca_oposta(Peca, NewPeca));(Peca = NewPeca))
-											%,((NewEPlus is NewE +1, NewEPlus < 5, NewPecaO = PecaO); peca_oposta(PecaO, NewPecaO))
+											,((NewE > I, peca_oposta(Peca, NewPeca));(Peca = NewPeca))
 											)),
-										((0 is (Nl mod 2), seeList(X, Nc, Peca, NewI, NewI));(seeList(X, Nc, Peca, NewE, NewE))),
+										((0 is (Nl mod 2), seeList(X, Nc, NewPeca, NewI, NewI));(seeList(X, Nc, NewPeca, NewE, NewE))),
 										NewNl is Nl - 1, 
 										getState(Resto, NewNl, Nc, NewI, NewE, NewPeca).
 
@@ -60,7 +58,7 @@ start:- repeat,
 	
 who_starts(Peca):- nl, write('ALWAYS INSERT \'.\' AFTER EACH COMAND'), nl, nl, 
 			 repeat,
-			 write('Who\'s starting?(\'X\' or \'O\')'), nl, 
+			 write('Whos starting?(\'X\' or \'O\')'), nl, 
 			 read(X), get_char(_),
 			 
 			 ((X == 'x', Peca = 'X'); (X == 'X', Peca = 'X');(X == 'o', Peca = 'O'); (X == 'O' , Peca = 'O'); 
