@@ -1,6 +1,7 @@
 :- use_module(library(random)).
 :- use_module(library(lists)).
 :- include('tui2.pl').
+:- use_module(library(clpfd)).
 
 
 pieceX('X').
@@ -49,14 +50,12 @@ seeList([X| Resto], Nc, Peca, Counter ,InitialIdx):-  boardSize(BoardSize), Nc <
 getState([], 0, _, _, _, _).
 getState([X | Resto] , Nl, Nc, I, E, Peca):- Nl > 0, write(I), write('-'), write(E),
 										((0 is (Nl mod 2), NewE = E, AuxI is I -1, ((AuxI < 0, NewI = 4); NewI= AuxI)
-											,((E > I, peca_oposta(Peca, NewPeca));(Peca = NewPeca))
-											%,((NewIPlus is NewI +1, NewIPlus < 5, NewPecaX = PecaX); peca_oposta(PecaX, NewPecaX))
+											,((E < NewI, peca_oposta(Peca, NewPeca));(Peca = NewPeca))
 											);
 										(NewI = I, AuxE is E -1, ((AuxE < 0, NewE = 4); NewE = AuxE) 
-											,((E < I, peca_oposta(Peca, NewPeca));(Peca = NewPeca))
-											%,((NewEPlus is NewE +1, NewEPlus < 5, NewPecaO = PecaO); peca_oposta(PecaO, NewPecaO))
+											,((NewE > I, peca_oposta(Peca, NewPeca));(Peca = NewPeca))
 											)),
-										((0 is (Nl mod 2), seeList(X, Nc, Peca, NewI, NewI));(seeList(X, Nc, Peca, NewE, NewE))),
+										((0 is (Nl mod 2), seeList(X, Nc, NewPeca, NewI, NewI));(seeList(X, Nc, NewPeca, NewE, NewE))),
 										NewNl is Nl - 1, 
 										getState(Resto, NewNl, Nc, NewI, NewE, NewPeca).
 
@@ -127,10 +126,33 @@ showScore(UnFnSX, UnFnSO):- SX is UnFnSX, SO is UnFnSO,
 					  (((SX > SO, player1(X));(SX < SO, player2(X))),  write('Player '), write(X), write(' wins!'));
 					  (SX =:= SO, write('Players tied!')).
 
-player_play(Peca, Board, RulesAppliedBoard):- ask_coordinates(X,Y),
-											  play_peca(X, Y, Peca, Board, RulesAppliedBoard).
+%player_play(Peca, Board, Board2):-ask_coordinates(X1,Y1, Peca),
+%								  play_peca(X1, Y1, Peca, Board, Board1),
+%								  ask_coordinates(X2,Y2, Peca),
+%								  play_peca(X2, Y2, Peca, Board1, Board2),
+%								  checkValid(X1, Y1, Board2, Peca),
+%								  checkValid(X2, Y2, Board2, Peca).
+
+
+player_play(Peca, Board, Board3):-%play_peca(X1, Y1, Peca, Board, Board1),
+								  %play_peca(X2, Y2, Peca, Board1, Board2),
+								  repeat,
+								  boardSize(BoardSize),
+								  domain([X1,Y1,X2,Y2], 1, BoardSize),
+								  labeling([],[X1,Y1,X2,Y2]),
+								  write(X1:Y1:X2:Y2:nl),
+								  
+								  checkValid(X1, Y1, Board, Peca),
+								  play_peca(X1, Y1, Peca, Board, Board2),
+								  checkValid(X2, Y2, Board2, Peca),
+								  play_peca(X2, Y2, Peca, Board2, Board3),
+								  %write(Board3),nl,
+								  get_char(_),
+								  drawBoard(Board3),
+								  fail.
 		
-ask_coordinates(X,Y):-  nl, write('Turn: '), nl, write('Enter Coordinates:'), nl,  
+ask_coordinates(X,Y, Peca):-  nl, write('Turn: '), write(Peca), nl, write('Enter Coordinates:'), nl,  
+				
 						repeat,
 						write('X:'), getInt(X), 
 						write('Y:'), getInt(Y), 
@@ -139,32 +161,62 @@ ask_coordinates(X,Y):-  nl, write('Turn: '), nl, write('Enter Coordinates:'), nl
 						X < LimitPlus , X > 0,
 						Y < LimitPlus , Y > 0.
 		
-play_peca(X, Y, Peca, Board, NewBoard):- 
-						setPeca(_, Board, Y, X, Peca, NewBoard),
+play_peca(X, Y, Peca, Board, NewBoard):- setPeca(Board, Y, X, Peca, NewBoard), !.
 						
-						drawBoard(NewBoard).
+checkValid(X, Y, NewBoard, Peca):-
+						checkValid(X, Y, -1, -1, NewBoard, Peca),
+						checkValid(X, Y, -1, 1, NewBoard, Peca),
+						checkValid(X, Y, 1, -1, NewBoard, Peca),
+						checkValid(X, Y, 1, 1, NewBoard, Peca), !.
 						
+checkValid(X, Y, SideX, SideY, Board, Peca):-   
+												NewX is X + SideX,
+												NewY is Y + SideY,
+												\+ get_pecaXY(NewX, NewY, Board, Peca).
+												
+checkValid(X, Y, SideX, SideY, Board, Peca):-   (NewY is Y + SideY,get_pecaXY(X,NewY, Board, Peca));
+												(NewX is X + SideX,get_pecaXY(NewX,Y, Board, Peca)).
+											
+												%(write(NewY),get_pecaXY(X,NewY, Board, Peca),write(X),write('-'),write(NewY),write('='),write(Y),write('+'),write(SideY),write(Peca));get_pecaXY(NewX,Y, Board, Peca).												
+	
+get_pecaXY(X, Y, Board, Peca):- nth1(Y,Board,Line),
+								nth1(X,Line,Peca).
+								
+replace( [L|Ls] , 0 , Y , Z , [R|Ls] ) :- % once we find the desired row,
+  replace_column(L,Y,Z,R)                 % - we replace specified column, and we're done.
+  .                                       %
+replace( [L|Ls] , X , Y , Z , [L|Rs] ) :- % if we haven't found the desired row yet
+  X > 0 ,                                 % - and the row offset is positive,
+  X1 is X-1 ,                             % - we decrement the row offset
+  replace( Ls , X1 , Y , Z , Rs )         % - and recurse down
+  .                                       %
 
-
+replace_column( [_|Cs] , 0 , Z , [Z|Cs] ) .  % once we find the specified offset, just make the substitution and finish up.
+replace_column( [C|Cs] , Y , Z , [C|Rs] ) :- % otherwise,
+  Y > 0 ,                                    % - assuming that the column offset is positive,
+  Y1 is Y-1 ,                                % - we decrement it
+  replace_column( Cs , Y1 , Z , Rs )         % - and recurse down.
+  .                						
+	
 get_peca(X, [_|Xs], Peca):- X > 1, NewX is X - 1, get_peca(NewX, Xs, Peca).
 get_peca(1, [Peca|_], Peca).
 								 
 equal_pecas(X,X).
 
-setPecaLinha(NewPeca, [X| Resto] , [Insert | Resto], 1, Peca):- emptySpace(Espaco) , 
-																((X == Espaco, NewPeca = Peca, Insert = Peca); 
-																(X \== Espaco, peca_oposta(Peca, NewPeca), Insert = X)).
+setPecaLinha([X| Resto] , [Insert | Resto], 1, Peca):- emptySpace(Espaco) , 
+													  X == Espaco,
+													  Insert = Peca.
 				
-setPecaLinha(NewPeca, [X | Resto1], [X | Resto2], NCol, Peca):-
+setPecaLinha([X | Resto1], [X | Resto2], NCol, Peca):-
 	NewNCol is NCol -1,
-	setPecaLinha(NewPeca, Resto1, Resto2, NewNCol, Peca).
+	setPecaLinha(Resto1, Resto2, NewNCol, Peca).
 				
-setPeca(NewPeca, [Head1 | Resto], 1, NCol, Peca, [Head2 | Resto]) :-
-	setPecaLinha(NewPeca, Head1, Head2, NCol, Peca).
+setPeca( [Head1 | Resto], 1, NCol, Peca, [Head2 | Resto]) :- 
+	setPecaLinha(Head1, Head2, NCol, Peca).
 				
-setPeca(NewPeca, [Head | Resto1], NLinha, NCol, Peca, [Head | Resto2]) :-
+setPeca([Head | Resto1], NLinha, NCol, Peca, [Head | Resto2]) :-
 	NLinha > 1, NewNLinha is NLinha - 1,
-	setPeca(NewPeca, Resto1, NewNLinha, NCol, Peca, Resto2).
+	setPeca(Resto1, NewNLinha, NCol, Peca, Resto2).
 	
 clear :- 
     format('~c~s~c~s', [0x1b, "[H", 0x1b, "[2J"]). 
