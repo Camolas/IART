@@ -36,7 +36,14 @@ printColumnsIdentifiersAux(BoardSizePlus1):-
 	
 printColumnsIdentifiersAux(Identifier):-
 	IdentifierPlus1 is Identifier + 1,
-	((Identifier < 10, write('  ')); write(' ')),
+	Identifier < 10, write('  '),
+	write(Identifier),
+	write(' '),
+	printColumnsIdentifiersAux(IdentifierPlus1).
+	
+printColumnsIdentifiersAux(Identifier):-
+	IdentifierPlus1 is Identifier + 1,
+	write(' '),
 	write(Identifier),
 	write(' '),
 	printColumnsIdentifiersAux(IdentifierPlus1).
@@ -58,7 +65,15 @@ printBoardLine([LineHead|LineTail]):-
 
 	
 printLine(BoardLine,LineIdentifier):-
-	((LineIdentifier < 10, write('  ')); write(' ')),
+	LineIdentifier < 10, write('  '),
+	write(LineIdentifier),
+	write(' |'),
+	printBoardLine(BoardLine),
+	nl.
+	
+	
+printLine(BoardLine,LineIdentifier):-
+	write(' '),
 	write(LineIdentifier),
 	write(' |'),
 	printBoardLine(BoardLine),
@@ -67,16 +82,26 @@ printLine(BoardLine,LineIdentifier):-
 printBoardAux([],_).
 printBoardAux([BoardHead | BoardTail], Identifier):-
 	printLine(BoardHead,Identifier),
-	printSeparator,
+	%printSeparator,
 	IdentifierPlus1 is Identifier + 1,
 	printBoardAux(BoardTail,IdentifierPlus1).
 
-drawBoard(Board):-
-	nl,
-	printSeparator,
+%drawBoard(Board):-
+	%nl,
+	%printSeparator,
+	%printBoardAux(Board,1).
+	%printColumnsIdentifiers.
+
+drawBoard([]).	
+drawBoard([LineHead|LineTail]):-
+	write(LineHead),nl,
+	drawBoard(LineTail).
+	%nl,
+	%printSeparator,
 	%lineIdentifiers(Identifiers),
-	printBoardAux(Board,1),
-	printColumnsIdentifiers.
+	%printBoardAux(Board,1),
+	%printColumnsIdentifiers.
+
 
 
 

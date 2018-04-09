@@ -13,26 +13,7 @@ boardSize(12).
 firstPosition(2).
 secondPosition(4).
 
-retMat3x3(X,Y,Mat):-
-	boardSize(X),
-	%if X = sizeMat, 
-		%last row empty
-		%get first row
-		
-	%if X = 0, 
-		%first row empty
-		%get last row
-	%if Y = sizeMat, 
-		%last column empty
-		%get first column
-		
-	%if Y = 0, first row empty
-		%first column empty
-		%get last column
 
-checkValid([Linha|Resto],X,Y,Peca):-
-.
-%getPeca(X,Linha,Peca).
 
 
 
