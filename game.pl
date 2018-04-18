@@ -84,13 +84,14 @@ pvp:-   who_starts(Starter_Peca),
 		drawBoard(Board),
 		start_pvp(Board, Starter_Peca).
 		
-start_pvp(Board, Peca):- player_play(Peca, Board, RulesAppliedBoard),
-						 \+stopIfEndGame(RulesAppliedBoard),
+start_pvp(Board, Peca):- askNumberOfPlays(NumberOfPlays),!, 
+						player_play(Peca, Board, RulesAppliedBoard,NumberOfPlays),
+						% \+stopIfEndGame(RulesAppliedBoard),
 						 peca_oposta(Peca, Peca_oposta),
 						 start_pvp(RulesAppliedBoard, Peca_oposta),
 						 !.
 						 
-start_pvp(Board, _):-  endGame(Board).
+start_pvp(_, Peca):-  write(Peca),write('wins the game'),nl.
 				
 stopIfEndGame([List|Board]):- checkStateRow(List), stopIfEndGame(Board).
 stopIfEndGame([]).		
@@ -99,7 +100,18 @@ checkStateRow([X|List]):- emptySpace(Espaco), X \== Espaco, checkStateRow(List).
 checkStateRow([]).
 		
 		
-		
+askNumberOfPlays(NumberOfPlays):-
+	 repeat,
+			 write('Number of Plays (1 or 2): '), 
+			 getInt(Input),
+			 (
+				(Input == 1, NumberOfPlays=1);
+				(Input == 2, NumberOfPlays=2);
+				
+				nl, write('Error: invalid input.'), nl, nl,
+				fail
+			).
+			
 		
 		
 		
@@ -186,30 +198,53 @@ showScore(UnFnSX, UnFnSO):- SX is UnFnSX, SO is UnFnSO,
 					  (((SX > SO, player1(X));(SX < SO, player2(X))),  write('Player '), write(X), write(' wins!'));
 					  (SX =:= SO, write('Players tied!')).
 
-%player_play(Peca, Board, Board2):-ask_coordinates(X1,Y1, Peca),
-%								  play_peca(X1, Y1, Peca, Board, Board1),
-%								  ask_coordinates(X2,Y2, Peca),
-%								  play_peca(X2, Y2, Peca, Board1, Board2),
-%								  checkValid(X1, Y1, Board2, Peca),
-%								  checkValid(X2, Y2, Board2, Peca).
+player_play(Peca, Board, Board2,2):- drawBoard(Board),
+								  ask_coordinates(X1,Y1, Peca),
+								  play_peca(X1, Y1, Peca, Board, Board1),
+								  drawBoard(Board1),
+								  ask_coordinates(X2,Y2, Peca),
+								  play_peca(X2, Y2, Peca, Board1, Board2),
+								  checkValid(X1, Y1, Board2, Peca),
+								  checkValid(X2, Y2, Board2, Peca), !,
+								  \+endGame(Board2, Peca, [X1,Y1]), !,
+								  \+endGame(Board2, Peca, [X2,Y2]).
+
+player_play(Peca, Board, Board1,1):- drawBoard(Board),
+									ask_coordinates(X1,Y1, Peca),
+								  play_peca(X1, Y1, Peca, Board, Board1),!,
+								  \+endGame(Board1, Peca, [X1,Y1]).
 
 
-player_play(Peca, Board, Board3):-%play_peca(X1, Y1, Peca, Board, Board1),
-								  %play_peca(X2, Y2, Peca, Board1, Board2),
-								  repeat,
-								  boardSize(BoardSize),
-								  domain([X1,Y1,X2,Y2], 1, BoardSize),
-								  labeling([],[X1,Y1,X2,Y2]),
-								  write(X1:Y1:X2:Y2:nl),
+% player_play(Peca, Board, Board3):-%play_peca(X1, Y1, Peca, Board, Board1),
+								  %% play_peca(X2, Y2, Peca, Board1, Board2),
+								  % repeat,
+								  % boardSize(BoardSize),
+								  % domain([X1,Y1,X2,Y2], 1, BoardSize),
+								  % labeling([],[X1,Y1,X2,Y2]),
+								  % write(X1:Y1:X2:Y2:nl),
 								  
-								  checkValid(X1, Y1, Board, Peca),
-								  play_peca(X1, Y1, Peca, Board, Board2),
-								  checkValid(X2, Y2, Board2, Peca),
-								  play_peca(X2, Y2, Peca, Board2, Board3),
-								  %write(Board3),nl,
-								  get_char(_),
-								  drawBoard(Board3),
-								  fail.
+								  % checkValid(X1, Y1, Board, Peca),
+								  % play_peca(X1, Y1, Peca, Board, Board2),
+								  % checkValid(X2, Y2, Board2, Peca),
+								  % play_peca(X2, Y2, Peca, Board2, Board3),
+								  %% write(Board3),nl,
+								  % get_char(_),
+								  % drawBoard(Board3),
+								  % fail.
+test:-								  
+	endGame([['O','X','X','O',' ','X','O',' ',' ',' ',' ','X'],
+['O',' ','X','O',' ',' ',' ',' ','X',' ',' ',' '],
+['O',' ','X',' ',' ','X',' ',' ',' ',' ','O',' '],
+['O',' ','X',' ',' ',' ',' ','O',' ',' ',' ',' '],
+['O',' ','X',' ','O',' ',' ',' ',' ','X',' ',' '],
+['O','O','X',' ',' ',' ','X',' ',' ',' ',' ','O'],
+['X','O','X','X',' ',' ',' ',' ','O',' ',' ',' '],
+['X','O',' ','X',' ','O',' ',' ',' ',' ','X',' '],
+['O','O','O','X',' ',' ',' ','X',' ',' ',' ',' '],
+['O','O','O','X','X',' ',' ',' ',' ','O',' ',' '],
+['X','X','O',' ','X',' ','O',' ',' ',' ',' ','X'],
+['X',' ','O','O','X',' ',' ',' ','X',' ',' ',' ']],'O',[1,1]).
+								  
 		
 ask_coordinates(X,Y, Peca):-  nl, write('Turn: '), write(Peca), nl, write('Enter Coordinates:'), nl,  
 				
