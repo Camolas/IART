@@ -63,7 +63,7 @@ start:-
 	
 who_starts(Peca):- 
 			 repeat,
-			 write('Who\'s starting?(\'X\' or \'O\')'), nl, 
+			 write('Who\'s starting?(\'X\' or \'O\')'), nl, %'
 			 write('1. \'X\''), nl,
 			 write('2. \'O\''), nl,
 			 getInt(Input),
@@ -98,10 +98,89 @@ stopIfEndGame([]).
 checkStateRow([X|List]):- emptySpace(Espaco), X \== Espaco, checkStateRow(List).
 checkStateRow([]).
 		
-endGame(Board):- clear, 
-				 drawBoard(Board), nl,
-				 getScores(SX,SO,Board),
-				 showScore(SX, SO).
+		
+		
+		
+		
+		
+%endGame(Board):- clear, 
+				 %drawBoard(Board), nl,
+				 %getScores(SX,SO,Board),
+				 %showScore(SX, SO).
+				 
+getAdjacentCoordsOfSameType([X,Y],Board,AdjCoords):-
+	get_pecaXY(X, Y, Board, Peca),
+	getAdjacentCheckValid(X, Y, 0, -1, Board, Peca, AdjCoord1),
+	getAdjacentCheckValid(X, Y, 1, 0, Board, Peca, AdjCoord2),
+	getAdjacentCheckValid(X, Y, 0, 1, Board, Peca, AdjCoord3),
+	getAdjacentCheckValid(X, Y, -1, 0, Board, Peca, AdjCoord4),
+	append([AdjCoord1,AdjCoord2,AdjCoord3,AdjCoord4],AdjCoords).
+		
+
+getAdjacentCheckValid(X, Y, SideX, SideY, Board, Peca,Coords):-
+	NewX is X + SideX,
+	NewY is Y + SideY,
+	get_pecaXY(NewX, NewY, Board, Peca),!,
+	Coords = [[NewX,NewY]].
+getAdjacentCheckValid(_, _, _, _, _, _,[]).
+	
+
+	
+				 
+endGame(Board, Piece, [CoordX,CoordY]):- 
+	endGameAux(Board,Piece,[[CoordX,CoordY]],[],0).
+	
+
+
+endGameAux(_,_,_,_,BoardSize):-
+	boardSize(BoardSize).
+	%BoardSize=4.
+
+
+endGameAux(_,_,[],_, _):-!,fail.
+
+endGameAux(Board,Piece,[CoordToCheck|CoordsToCheck],CoordsChecked, SizeChain):-
+	checkSizeChain(CoordToCheck,CoordsChecked,Piece,SizeChain,NewSizeChain),
+	TempCoordsChecked = [CoordToCheck|CoordsChecked],
+	getAdjacentCoordsOfSameType(CoordToCheck,Board,AdjCoords),
+	filterAdjacentCoords(AdjCoords,TempCoordsChecked,CoordsToCheck,NewCoordsChecked,NewCoordsToCheck),
+	%write(Board:Piece:NewCoordsToCheck:NewCoordsChecked:NewSizeChain),nl,
+	endGameAux(Board,Piece,NewCoordsToCheck,NewCoordsChecked,NewSizeChain).
+	
+	
+
+filterAdjacentCoords([],CoordsChecked,CoordsToCheck,CoordsChecked,CoordsToCheck).	
+filterAdjacentCoords([AdjCoord|AdjCoords],CoordsChecked,CoordsToCheck,NewCoordsChecked,NewCoordsToCheck):-
+	member(AdjCoord,CoordsChecked),!,
+	filterAdjacentCoords(AdjCoords,CoordsChecked,CoordsToCheck,NewCoordsChecked,NewCoordsToCheck).
+	
+filterAdjacentCoords([AdjCoord|AdjCoords],CoordsChecked,CoordsToCheck,NewCoordsChecked,NewCoordsToCheck):-
+	member(AdjCoord,CoordsToCheck),!,
+	filterAdjacentCoords(AdjCoords,CoordsChecked,CoordsToCheck,NewCoordsChecked,NewCoordsToCheck).
+	
+filterAdjacentCoords([AdjCoord|AdjCoords],CoordsChecked,CoordsToCheck,NewCoordsChecked,NewCoordsToCheck):-
+	!,
+	TempCoordsToCheck = [AdjCoord|CoordsToCheck],
+	filterAdjacentCoords(AdjCoords,CoordsChecked,TempCoordsToCheck,NewCoordsChecked,NewCoordsToCheck).
+	
+checkSizeChain([X,_],CoordsChecked,Piece,SizeChain,SizeChain):-
+	pieceX(Piece),
+	member([X,_],CoordsChecked),!.
+	
+checkSizeChain([_,Y],CoordsChecked,Piece,SizeChain,SizeChain):-
+	pieceO(Piece),
+	member([_,Y],CoordsChecked),!.
+
+checkSizeChain(_,_,_,SizeChain,NewSizeChain):-
+	!,	
+	NewSizeChain is SizeChain + 1.
+	
+ 
+				 
+				 
+				 
+				 
+				 
 					  
 showScore(UnFnSX, UnFnSO):- SX is UnFnSX, SO is UnFnSO,
 					  (((SX > SO, player1(X));(SX < SO, player2(X))),  write('Player '), write(X), write(' wins!'));
