@@ -15,8 +15,6 @@ secondPosition(4).
 
 
 
-
-
 peca_oposta(Peca, NewPeca):- 
 	player1(P1), 
 	player2(P2), 
@@ -35,7 +33,7 @@ fillLineAux([X| Remain], IndexLine, Piece, NextPieceIndex):-
 	X=Piece,
 	NewIndexLine is IndexLine+1,
 	peca_oposta(Piece, NewPiece),
-	NewNextPieceIndex is NextPieceIndex + 4,
+	NewNextPieceIndex is NextPieceIndex + 5,
 	fillLineAux(Remain, NewIndexLine, NewPiece, NewNextPieceIndex).
 
 fillLineAux([X| Remain], IndexLine, Piece, NextPieceIndex):-
@@ -285,7 +283,4 @@ setPeca( [Head1 | Resto], 1, NCol, Peca, [Head2 | Resto]) :-
 				
 setPeca([Head | Resto1], NLinha, NCol, Peca, [Head | Resto2]) :-
 	NLinha > 1, NewNLinha is NLinha - 1,
-	setPeca(Resto1, NewNLinha, NCol, Peca, Resto2).
-	
-clear :- 
-    format('~c~s~c~s', [0x1b, "[H", 0x1b, "[2J"]). 
+	setPeca(Resto1, NewNLinha, NCol, Peca, Resto2). 

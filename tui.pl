@@ -10,6 +10,9 @@ lineIdentifiers([' 1 ', ' 2 ', ' 3 ', ' 4 ', ' 5 ', ' 6 ', ' 7 ', ' 8 ', ' 9 ', 
 
 cls:-
 	write('\33\[2J').
+	
+clear :- 
+    format('~c~s~c~s', [0x1b, "[H", 0x1b, "[2J"]).
 
 printSeparator:-
 	boardSize(BoardSize),
@@ -29,18 +32,19 @@ printColumnsIdentifiers:-
 	
 printColumnsIdentifiersAux(BoardSizePlus1):-
 	boardSize(BoardSize),
-	BoardSizePlus1 is BoardSize + 1,
+	BoardSizePlus1 is BoardSize + 1, !,
 	 nl.
 	
 printColumnsIdentifiersAux(Identifier):-
 	IdentifierPlus1 is Identifier + 1,
-	Identifier < 10, write('  '),
+	Identifier < 10, !, write('  '),
 	write(Identifier),
 	write(' '),
 	printColumnsIdentifiersAux(IdentifierPlus1).
 	
 printColumnsIdentifiersAux(Identifier):-
 	IdentifierPlus1 is Identifier + 1,
+	Identifier >= 10, !,
 	write(' '),
 	write(Identifier),
 	write(' '),
@@ -53,7 +57,8 @@ printColumnsIdentifiersAux(Identifier):-
 printBoardCell(Elem):-
 	%getCellSymbol(Elem,ElemToPrint),
 	write(' '),
-	write(Elem),
+	getCellSymbol(Elem,ElemToPrint),
+	write(ElemToPrint),
 	write(' |').
 
 printBoardLine([]).	
@@ -63,7 +68,7 @@ printBoardLine([LineHead|LineTail]):-
 
 	
 printLine(BoardLine,LineIdentifier):-
-	LineIdentifier < 10, write('  '),
+	LineIdentifier < 10, !, write('  '),
 	write(LineIdentifier),
 	write(' |'),
 	printBoardLine(BoardLine),
@@ -71,6 +76,7 @@ printLine(BoardLine,LineIdentifier):-
 	
 	
 printLine(BoardLine,LineIdentifier):-
+	!,
 	write(' '),
 	write(LineIdentifier),
 	write(' |'),
@@ -80,14 +86,15 @@ printLine(BoardLine,LineIdentifier):-
 printBoardAux([],_).
 printBoardAux([BoardHead | BoardTail], Identifier):-
 	printLine(BoardHead,Identifier),
-	%printSeparator,
+	printSeparator,
 	IdentifierPlus1 is Identifier + 1,
 	printBoardAux(BoardTail,IdentifierPlus1).
 
 %drawBoard(Board):-
 	%nl,
 	%printSeparator,
-	%printBoardAux(Board,1).
+	%printBoardAux(Board,1),
+%
 	%printColumnsIdentifiers.
 
 %drawBoard([]).	
@@ -114,12 +121,11 @@ printBoardAux([BoardHead | BoardTail], Identifier):-
 	
 drawBoard(B):-
 	nl,
-	drawBoardAux(B).
+	drawBoardAux(B),nl.
 	
 drawBoardAux([]).	
 drawBoardAux([BoardHead|BoardTail]):-
 	drawLine(BoardHead),
-	%write(BoardHead),nl,
 	drawBoardAux(BoardTail).
 
 drawLine(Line):-
@@ -169,9 +175,9 @@ closeGame:-write('Closing Game...').
 	
 
 pressEnterToContinue:-
-	write('Pressione Enter para continuar.'),
+	write('Press Enter to Continue.'),
 	get_char(_),
-	 nl.
+	nl.
 
 getChar(Input):-
 	get_char(Input),
@@ -184,37 +190,33 @@ getCode(Input):-
 
 getInt(Input):-
 	get_code(FirstDigTemp),
-	FirstDig is FirstDigTemp - 48,
-	
-	get_code(SecDigTemp),
-	
-	( SecDigTemp = 10 ->
-		(
-			Input = FirstDig
-		);
-		(
-			SecDig is SecDigTemp - 48,
-			Input is FirstDig*10+SecDig,
-			get_char(_)		
-		)	
+	FirstDig is FirstDigTemp - 48,	
+	get_code(SecDigTemp),	
+	(SecDigTemp = 10 ->
+		(Input = FirstDig);
+		(SecDig is SecDigTemp - 48,
+		 Input is FirstDig*10+SecDig,
+		 get_char(_))	
 	).
 
 	
 printMainMenu:-
 	printLogo,
-	write('                                          1: Player vs Player                                     '), nl,
-	write('                                          2: Player vs Computer                                   '), nl,
-	write('                                          3: Computer vs Computer                                  '), nl,
-	write('                                          4: Exit                                                 '), nl,
-	write('                                    Please Choose (1-4): ').
+	write('                                        1: Player vs Player                                     '), nl,
+	write('                                        2: Player vs Computer                                   '), nl,
+	write('                                        3: Computer vs Computer                                 '), nl,
+	write('                                        4: Exit                                                 '), nl,
+	write('                                    Please Choose (1-4):                                        '), nl,nl,
+	write('################################################################################################').
 
 
 printLogo:-
-	write('################################################################################################# '), nl,
-	write('           ___  ___                  _   _                           _                            '), nl,
-	write('           |  \\/  |                 | | | |                         | |                          '), nl,
-	write('           | .  . | ___   ___  _ __ | |_| | __ _ _ ____   _____  ___| |_ ___ _ __ ___             '), nl,
-	write('           | |\\/| |/ _ \\ / _ \\| \'_ \\|  _  |/ _` | \'__\\ \\ / / _ \\/ __| __/ _ \\ \'__/ __| '), nl,
-	write('           | |  | | (_) | (_) | | | | | | | (_| | |   \\ V /  __/\\__ \\ ||  __/ |  \\__ \\       '), nl,
-	write('           \\_|  |_/\\___/ \\___/|_| |_\\_| |_/\\__,_|_|    \\_/ \\___||___/\\__\\___|_|  |___/   '), nl, nl,
-	write('################################################################################################# '), nl, nl.
+	write('################################################################################################'), nl,
+	write('                         __    __ _     _      _          _           _                         '), nl,
+	write('                        / / /\\ \\ \\ |__ (_)_ __| |_      _(_)_ __   __| |                     '), nl,
+	write('                        \\ \\/  \\/ / \'_ \\| | \'__| \\ \\ /\\ / / | \'_ \\ / _` |             '), nl, %'
+	write('                         \\  /\\  /| | | | | |  | |\\ V  V /| | | | | (_| |                     '), nl, 
+	write('                          \\/  \\/ |_| |_|_|_|  |_| \\_/\\_/ |_|_| |_|\\__,_|                   '), nl, nl,
+	write('################################################################################################'), nl, nl.
+	
+
