@@ -1,6 +1,6 @@
 :- use_module(library(random)).
 :- use_module(library(lists)).
-:- include('tui2.pl').
+:- include('tui.pl').
 :- use_module(library(clpfd)).
 
 
