@@ -17,16 +17,35 @@ secondPosition(4).
 
 
 
-peca_oposta(Peca, NewPeca):- player1(P1), player2(P2), ((Peca == P1, NewPeca = P2);(Peca == P2, NewPeca = P1)).
+peca_oposta(Peca, NewPeca):- 
+	player1(P1), 
+	player2(P2), 
+	((Peca == P1, NewPeca = P2);
+	 (Peca == P2, NewPeca = P1)).
+	 
+	 
+fillLine(Line, Piece, StartPos):-
+	fillLineAux(Line, 0, Piece, StartPos).
 
-seeList([], Nc, _, _, _):- boardSize(Nc).
-seeList([X| Resto], Nc, Peca, Counter ,InitialIdx):-  boardSize(BoardSize), Nc < BoardSize,
-											((Nc < InitialIdx, Y = ' ', NewPeca = Peca); 
-											(Nc == InitialIdx, Y = Peca, peca_oposta(Peca, NewPeca)); 
-											(AuxNc is Nc - InitialIdx, 0 is (AuxNc mod 5), Y = Peca, peca_oposta(Peca, NewPeca));
-											(Y = ' ', NewPeca = Peca)),
-											NewCounter is Counter + 1, X = Y, NewNc is Nc + 1, 
-											seeList(Resto, NewNc, NewPeca, NewCounter, InitialIdx).
+fillLineAux([], IndexLine, _, _):-
+	boardSize(IndexLine).
+	
+fillLineAux([X| Remain], IndexLine, Piece, NextPieceIndex):-
+	IndexLine = NextPieceIndex,
+	X=Piece,
+	NewIndexLine is IndexLine+1,
+	peca_oposta(Piece, NewPiece),
+	NewNextPieceIndex is NextPieceIndex + 4,
+	fillLineAux(Remain, NewIndexLine, NewPiece, NewNextPieceIndex).
+
+fillLineAux([X| Remain], IndexLine, Piece, NextPieceIndex):-
+	IndexLine \= NextPieceIndex,
+	emptySpace(EmptySpace),
+	X=EmptySpace,
+	NewIndexLine is IndexLine+1,
+	fillLineAux(Remain, NewIndexLine, Piece, NextPieceIndex).
+	
+
 
 getState([], 0, _, _, _, _).
 getState([X | Resto] , Nl, Nc, I, E, Peca):- Nl > 0, write(I), write('-'), write(E),
@@ -36,7 +55,7 @@ getState([X | Resto] , Nl, Nc, I, E, Peca):- Nl > 0, write(I), write('-'), write
 										(NewI = I, AuxE is E -1, ((AuxE < 0, NewE = 4); NewE = AuxE) 
 											,((NewE > I, peca_oposta(Peca, NewPeca));(Peca = NewPeca))
 											)),
-										((0 is (Nl mod 2), seeList(X, Nc, NewPeca, NewI, NewI));(seeList(X, Nc, NewPeca, NewE, NewE))),
+										((0 is (Nl mod 2), fillLine(X, NewPeca, NewI));(fillLine(X, NewPeca, NewE))),
 										NewNl is Nl - 1, 
 										getState(Resto, NewNl, Nc, NewI, NewE, NewPeca).
 

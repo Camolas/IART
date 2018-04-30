@@ -92,15 +92,24 @@ printBoardAux([BoardHead | BoardTail], Identifier):-
 	%printBoardAux(Board,1).
 	%printColumnsIdentifiers.
 
-drawBoard([]).	
-drawBoard([LineHead|LineTail]):-
-	write(LineHead),nl,
-	drawBoard(LineTail).
+%drawBoard([]).	
+%drawBoard([LineHead|LineTail]):-
+	%write(LineHead),nl,
+	%drawBoard(LineTail).
 	%nl,
 	%printSeparator,
 	%lineIdentifiers(Identifiers),
 	%printBoardAux(Board,1),
 	%printColumnsIdentifiers.
+	
+drawBoard(B):-
+	nl,
+	drawBoardAux(B).
+	
+drawBoardAux([]).	
+drawBoardAux([LineHead|LineTail]):-
+	write(LineHead),nl,
+	drawBoardAux(LineTail).
 
 
 
