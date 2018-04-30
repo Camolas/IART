@@ -4,11 +4,11 @@
 :- use_module(library(clpfd)).
 
 
-pieceX('X').
-pieceO('O').
-player1('X').
-player2('O').
-emptySpace(' ').
+pieceX(blackPiece).
+pieceO(whitePiece).
+player1(blackPiece).
+player2(whitePiece).
+emptySpace(sp).
 boardSize(12).
 firstPosition(2).
 secondPosition(4).
@@ -59,22 +59,12 @@ getState([X | Resto] , Nl, Nc, I, E, Peca):- Nl > 0, write(I), write('-'), write
 										NewNl is Nl - 1, 
 										getState(Resto, NewNl, Nc, NewI, NewE, NewPeca).
 
-firstState(Board):- boardSize(BoardSize), player1(NewPeca),firstPosition(I),  secondPosition(E), getState(Board, BoardSize, 0, I, E, NewPeca).
-
-drawBoardAux([], _).
-drawBoardAux([Y | Ys], X):-  NextX is X+1, write('| '), write(X), ((X < 10, write(' |')); write('|')),
-						 drawLine(Y), nl , drawBoardAux(Ys, NextX).
-drawLine([]):- nl,  write('|---+---+---+---+---+---+---+---+---+---+---+---+---|').
-drawLine([X | Xs]):- write(' '), write(X) , write(' |'), drawLine(Xs).
-
-
-drawBoard2(X):- drawTopIndexes(12), nl, write('|---|---|---|---|---|---|---|---|---|---|---|---|---|'), nl,  drawBoardAux(X, 1).
-
-drawTopIndexes(0):- nl, write('| '), write(0), write(' | ').
-drawTopIndexes(X):- NextX is X -1, drawTopIndexes(NextX), write(X), ((X < 10, write(' | ')); write('| ')).
-
-
-
+firstState(Board):- 
+	boardSize(BoardSize), 
+	player1(NewPeca),
+	firstPosition(I),  
+	secondPosition(E), 
+	getState(Board, BoardSize, 0, I, E, NewPeca).
 
 
 start:- 

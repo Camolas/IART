@@ -1,12 +1,10 @@
 %!	Print Board
 
+
 getCellSymbol(sp, ' ').
-getCellSymbol(ct, '#').
-getCellSymbol(h3, 'X').
-getCellSymbol(pc, 'O').
-getCellSymbol(pw, 'O').
-getCellSymbol(pl, 'O').
-getCellSymbol(pt, 'O').
+getCellSymbol(whitePiece, 'O').
+getCellSymbol(blackPiece, 'X').
+
 
 lineIdentifiers([' 1 ', ' 2 ', ' 3 ', ' 4 ', ' 5 ', ' 6 ', ' 7 ', ' 8 ', ' 9 ', '10 ', '11 ', '12 ']).
 
@@ -102,14 +100,45 @@ printBoardAux([BoardHead | BoardTail], Identifier):-
 	%printBoardAux(Board,1),
 	%printColumnsIdentifiers.
 	
+%drawBoardAux([], _).
+%drawBoardAux([Y | Ys], X):-  NextX is X+1, write('| '), write(X), ((X < 10, write(' |')); write('|')),
+%						 drawLine(Y), nl , drawBoardAux(Ys, NextX).
+%drawLine([]):- nl,  write('|---+---+---+---+---+---+---+---+---+---+---+---+---|').
+%drawLine([X | Xs]):- write(' '), write(X) , write(' |'), drawLine(Xs).
+
+
+%drawBoard2(X):- drawTopIndexes(12), nl, write('|---|---|---|---|---|---|---|---|---|---|---|---|---|'), nl,  drawBoardAux(X, 1).
+
+%drawTopIndexes(0):- nl, write('| '), write(0), write(' | ').
+%drawTopIndexes(X):- NextX is X -1, drawTopIndexes(NextX), write(X), ((X < 10, write(' | ')); write('| ')).
+	
 drawBoard(B):-
 	nl,
 	drawBoardAux(B).
 	
 drawBoardAux([]).	
-drawBoardAux([LineHead|LineTail]):-
-	write(LineHead),nl,
-	drawBoardAux(LineTail).
+drawBoardAux([BoardHead|BoardTail]):-
+	drawLine(BoardHead),
+	%write(BoardHead),nl,
+	drawBoardAux(BoardTail).
+
+drawLine(Line):-
+	write('['),
+	drawLineAux(Line),
+	write(']'),
+	nl.
+
+drawLineAux([LastElem|[]]):-
+	getCellSymbol(LastElem,Symbol),
+	write(Symbol).
+	
+drawLineAux([LineHead|LineTail]):-
+	getCellSymbol(LineHead,Symbol),
+	write(Symbol),
+	write(','),
+	drawLineAux(LineTail).
+	
+	
 
 
 
