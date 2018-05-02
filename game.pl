@@ -1,6 +1,7 @@
 :- use_module(library(random)).
 :- use_module(library(lists)).
 :- include('tui.pl').
+:- include('minimax.pl').
 :- use_module(library(clpfd)).
 
 
@@ -45,6 +46,10 @@ fillLineAux([X| Remain], IndexLine, Piece, NextPieceIndex):-
 	
 
 
+	
+	
+	
+	
 getState([], 0, _, _, _, _).
 getState([X | Resto] , Nl, Nc, I, E, Peca):- Nl > 0, write(I), write('-'), write(E),
 										((0 is (Nl mod 2), NewE = E, AuxI is I -1, ((AuxI < 0, NewI = 4); NewI= AuxI)
@@ -104,11 +109,7 @@ stopIfEndGame([]).
 		
 checkStateRow([X|List]):- emptySpace(Espaco), X \== Espaco, checkStateRow(List).
 checkStateRow([]).
-		
-		
-		
-		
-		
+
 		
 %endGame(Board):- clear, 
 				 %drawBoard(Board), nl,
