@@ -1,7 +1,9 @@
+:- use_module(library(statistics)).
+:- use_module(library(between)).
 
 maxint(X):- boardSize(BS), X is BS + 100.
 
-dominio(V):- boardSize(BS)
+dominio(V):- boardSize(BS),
 			 between(1,BS, V).
 
 sucessor(Board, (Board_Aux, Coords), Level):- 
@@ -14,7 +16,7 @@ sucessor(Board, (Board_Aux, Coords), Level):-
 			  pieceX(X),
 			  pieceO(O),
 			  
-			  ((Level == max, Peca = X); (Level == min, Peca = O)),
+			  ((Level == max_, Peca = X); (Level == min_, Peca = O)),
 			  
 			  checkValid(X1, Y1, Board, Peca),
 			  play_peca(X1, Y1, Peca, Board, Board2),
@@ -22,38 +24,54 @@ sucessor(Board, (Board_Aux, Coords), Level):-
 			  play_peca(X2, Y2, Peca, Board2, Board_Aux),
 			  
 			  Coords = [X1,Y1,X2,Y2].
-			  
+		
 
+test:- minimax(3, [[sp,blackPiece,sp,sp,sp,sp,whitePiece,sp,sp,sp,sp,blackPiece]
+					,[sp,sp,sp,whitePiece,sp,sp,sp,sp,blackPiece,sp,sp,sp]
+					,[whitePiece,sp,sp,sp,sp,blackPiece,sp,sp,sp,sp,whitePiece,sp]
+					,[sp,sp,blackPiece,sp,sp,sp,sp,whitePiece,sp,sp,sp,sp]
+					,[sp,sp,sp,sp,whitePiece,sp,sp,sp,sp,blackPiece,sp,sp]
+					,[sp,whitePiece,sp,sp,sp,sp,blackPiece,sp,sp,sp,sp,whitePiece]
+					,[sp,sp,sp,blackPiece,sp,sp,sp,sp,whitePiece,sp,sp,sp]
+					,[blackPiece,sp,sp,sp,sp,whitePiece,sp,sp,sp,sp,blackPiece,sp]
+					,[sp,sp,whitePiece,sp,sp,sp,sp,blackPiece,sp,sp,sp,sp]
+					,[sp,sp,sp,sp,blackPiece,sp,sp,sp,sp,whitePiece,sp,sp]
+					,[sp,blackPiece,sp,sp,sp,sp,whitePiece,sp,sp,sp,sp,blackPiece]
+					,[sp,sp,sp,whitePiece,sp,sp,sp,sp,blackPiece,sp,sp,sp]]).
+		
+
+getPlayValue(Board, Coord, 1).
+		
 minimax(Depth, Board):- 
 
 				maxint(Maxint), 
 				Alpha is -Maxint, 
 				Beta is Maxint,
-				maximizador(Depth, Alpha, Beta, Board, [], _, - Maxint, - Maxint).
+				maximizador(Depth, Alpha, Beta, Board, [], _, Alpha , Alpha).
 
 				
 				
-iterate_max([], Alpha, _, _ , Alpha).				
+iterate_max([], Alpha, _, _ , Alpha, _, _).				
 
-iterate_max(_, Alpha, Beta, _ , Beta):- Alpha >= Beta.
+iterate_max(_, Alpha, Beta, _ , Beta, _, _):- Alpha >= Beta.
 				
 iterate_max([(Board, Coord)|Boards], Alpha, Beta, Depth, Return, BestMaxPlay, BestMinPlay):-
 							
 				Alpha < Beta,
 				minimizador(Depth, Alpha, Beta, Board, Coord, MinReturn, BestMaxPlay, BestMinPlay),
-				max_list([Alpha, MinReturn], NewAlpha),
-				iterate(Boards, NewAlpha, Beta,  Depth, Return).
+				max([Alpha, MinReturn], NewAlpha),
+				iterate_max(Boards, NewAlpha, Beta,  Depth, Return, BestMaxPlay, BestMinPlay).
 	
-iterate_min([], _, Beta, _ , Beta).				
+iterate_min([], _, Beta, _ , Beta, _, _).				
 
-iterate_min(_, Alpha, Beta, _ , Alpha):- Alpha >= Beta.
+iterate_min(_, Alpha, Beta, _ , Alpha, _, _):- Alpha >= Beta.
 				
 iterate_min([(Board, Coord)|Boards], Alpha, Beta, Depth, Return, BestMaxPlay, BestMinPlay):-
 				
 				Alpha < Beta,
 				maximizador(Depth, Alpha, Beta, Board, Coord, MaxReturn, BestMaxPlay, BestMinPlay),
-				min_list([Beta, MaxReturn], NewBeta),
-				iterate(Boards, Alpha, NewBeta, Depth, Return).
+				min([Beta, MaxReturn], NewBeta),
+				iterate_min(Boards, Alpha, NewBeta, Depth, Return, BestMaxPlay, BestMinPlay).
 
 
 				
@@ -63,21 +81,24 @@ maximizador(Depth, Alpha, Beta, Board, Coord, Return, BestMaxPlay, BestMinPlay):
 
 				Depth > 0,
 				
+				write('Maximizer: ':Coord:' Depth: ':Depth),nl,
+				%drawBoard(Board),
+				
 				((Coord == [], Value = BestMaxPlay) ; getPlayValue(Board, Coord, Value)),
 				
 				boardSize(BS),
 				
-				(Value == BS, Return = BS);
+				((Value == BS, Return = BS);
 				
 				(Value < BS,
 				
-				max_list([BestMaxPlay, Value], NewBestMaxPlay),
+				max([BestMaxPlay, Value], NewBestMaxPlay),
 
-				findall((Board_Aux, Coords), sucessor(Board, (Board_Aux, Coords), max), Boards),
+				findall((Board_Aux, Coords), sucessor(Board, (Board_Aux, Coords), max_), Boards),
 				
 				NewDepth is Depth - 1,
 				
-				iterate_max(Boards, Alpha, Beta, NewDepth, Return, NewBestMaxPlay, BestMinPlay)).
+				iterate_max(Boards, Alpha, Beta, NewDepth, Return, NewBestMaxPlay, BestMinPlay))).
 				
 			
 minimizador(0, _, _, _, _, Return, BestMaxPlay, BestMinPlay):- Return is BestMaxPlay - BestMinPlay.
@@ -86,19 +107,23 @@ minimizador(Depth, Alpha, Beta, Board, Coord, Return, BestMaxPlay, BestMinPlay):
 
 				Depth > 0,
 				
+				write('Minimizer: ':Coord:' Depth: ':Depth),nl,
+				%drawBoard(Board),
+				
+				
 				((Coord == [], Value = BestMinPlay) ; getPlayValue(Board, Coord, Value)),
 				
 				boardSize(BS),
 				
-				(Value == BS, Return = BS);
+				((Value == BS, Return = BS);
 				
 				(Value < BS,
 				
-				max_list([BestMinPlay, Value], NewBestMinPlay),
+				max([BestMinPlay, Value], NewBestMinPlay),
 
-				findall((Board_Aux, Coords), sucessor(Board, (Board_Aux, Coords), min), Boards),
+				findall((Board_Aux, Coords), sucessor(Board, (Board_Aux, Coords), min_), Boards),
 				
 				NewDepth is Depth - 1,
 				
-				iterate_min(Boards, Alpha, Beta, NewDepth, Return, BestMaxPlay, NewBestMinPlay)).
+				iterate_min(Boards, Alpha, Beta, NewDepth, Return, BestMaxPlay, NewBestMinPlay))).
 				

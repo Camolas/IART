@@ -10,7 +10,7 @@ pieceO(whitePiece).
 player1(blackPiece).
 player2(whitePiece).
 emptySpace(sp).
-boardSize(12).
+boardSize(8).
 firstPosition(2).
 secondPosition(4).
 
