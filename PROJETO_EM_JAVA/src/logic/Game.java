@@ -15,13 +15,18 @@ public class Game {
 	public final static int depth = 3;
 
 	public static void main(String[] args) {
-		Minimax minimax = new Minimax();
+		//Minimax minimax = new Minimax();
 		
 		byte[][] board = null;
 		
 		board = generateBoard();
 		
-		minimax.applyMinimax(depth, board);
+		Integer[] list1 = {1,2};
+		Integer[] list2 = {1,2};
+		
+		System.out.println(list1.equals(list2));
+		
+		//minimax.applyMinimax(depth, board);
 	}
 
 	private static byte[][] generateBoard() {

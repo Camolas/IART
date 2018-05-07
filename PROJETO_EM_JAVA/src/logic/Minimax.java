@@ -1,5 +1,7 @@
 package logic;
 
+import java.util.ArrayList;
+import java.util.Stack;
 
 public class Minimax {
 
@@ -91,8 +93,8 @@ public class Minimax {
 									alpha = value;  
 								}
 							
-						//if(alpha >= beta)
-						//	return (level?alpha:beta);
+						if(alpha >= beta)
+							return (level?alpha:beta);
 					}	
 				}	
 			}	
@@ -106,7 +108,7 @@ public class Minimax {
 			return bmaxplay - bminplay;	
 		}
 		
-		int value = (coords==null ? bmaxplay : getLongestChain(board, coords));
+		int value = (coords==null ? bmaxplay : getLongestChain(board, coords, Game.whitepiece));
 
 		if(value == Game.boardsize){
 			return Game.boardsize;
@@ -128,13 +130,11 @@ public class Minimax {
 			return bmaxplay - bminplay;	
 		}
 		
-		int value = (coords==null ? bminplay : getLongestChain(board, coords));
+		int value = (coords==null ? bminplay : getLongestChain(board, coords, Game.blackpiece));
 		
 		if(value == Game.boardsize){
 			return -Game.boardsize;
 		}
-		
-		//System.out.println("minimizer X:"+coords[0] + " Y:" + coords[1]+ " X:" + coords[2]+ " Y:" +coords[3]);
 		
 		if(bminplay< value){
 			bminplay = value;
@@ -143,14 +143,86 @@ public class Minimax {
 		return iterate(depth, alpha, beta, board, bmaxplay, bminplay, MINIMIZER);
 	}	
 
-	public int getLongestChain(byte[][] board, int[] coords){
+	private boolean listContainsCoords(ArrayList<Integer[]> list, Integer[] coordFind){
+		for(Integer[] coord: list){
+			if(coord[0]==coordFind[0] && coord[1]==coordFind[1]){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public int getLongestChain(byte[][] board, int[] coords, byte peca){
 
-		int X1 = coords[0];
-		int Y1 = coords[1];
-		int X2 = coords[2];
-		int Y2 = coords[3];
 		
-		//Arraylist<int>
+		Integer[] firstPoint = {coords[0], coords[1]};
+		
+		Integer[] secondPoint = {coords[2], coords[3]};
+		
+		ArrayList<Integer[]> steppedOn = new ArrayList<Integer[]>();
+		Stack<Integer[]> explore = new Stack<Integer[]>();
+		
+		explore.push(firstPoint);
+		explore.push(secondPoint);
+		
+		int hMax = -1;
+		int hMin = Game.boardsize + 1;
+
+		int vMax = -1;
+		int vMin = Game.boardsize + 1;
+		
+		while(explore.size()!=0){
+			Integer[] current = explore.pop();
+			steppedOn.add(current);
+			
+			int X = current[0];
+			int Y = current[1];
+			
+			if(X > hMax)
+				hMax = X;
+
+			if(X < hMin)
+				hMin = X;
+			
+			if(Y > vMax)
+				vMax = Y;
+			
+			if(Y < vMin)
+				vMin = Y;
+			
+			//TODO: Change search to matrix of nodes with visited variable
+			
+			if(X>0){
+				Integer[] tryP = new Integer[]{X-1,Y};
+				if(board[X-1][Y] == peca && listContainsCoords(steppedOn, tryP) ){
+					explore.push(tryP); 
+				}
+			}
+			
+			if(Y>0){
+				Integer[] tryP = new Integer[]{X,Y-1};
+				if(board[X][Y-1] == peca && listContainsCoords(steppedOn, tryP) ){
+					explore.push(tryP);
+				}
+			}
+			
+			if(X < (Game.boardsize-1)){
+				Integer[] tryP = new Integer[]{X+1,Y};
+				if(board[X+1][Y] == peca && listContainsCoords(steppedOn, tryP) ){
+					explore.push(tryP);
+				}
+			}
+
+			if(Y < (Game.boardsize-1)){
+				Integer[] tryP = new Integer[]{X,Y+1};
+				if(board[X][Y+1] == peca && listContainsCoords(steppedOn, tryP) ){
+					explore.push(tryP);
+				}
+			}
+		}
+		
+		//TODO: if(peca = preta) (returnar par com valor horizontal e valor vertical) else (returnar par com valor vertical e valor horizontal) 
+		
 		return 1;
 	}
 	
