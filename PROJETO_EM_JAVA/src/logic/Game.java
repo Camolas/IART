@@ -15,18 +15,12 @@ public class Game {
 	public final static int depth = 3;
 
 	public static void main(String[] args) {
-		//Minimax minimax = new Minimax();
+		Minimax minimax = new Minimax();
 		
 		byte[][] board = null;
 		
-		board = generateBoard();
-		
-		Integer[] list1 = {1,2};
-		Integer[] list2 = {1,2};
-		
-		System.out.println(list1.equals(list2));
-		
-		//minimax.applyMinimax(depth, board);
+		board = generateBoard();		
+		minimax.applyMinimax(depth, board);
 	}
 
 	private static byte[][] generateBoard() {
@@ -44,18 +38,18 @@ public class Game {
 						,{empty,empty,empty,whitepiece,empty,empty,empty,empty,blackpiece,empty,empty,empty}};
 		
 
-		byte[][] ret2 = {{empty,blackpiece,empty,empty,empty,empty,whitepiece,empty,empty,empty,empty,blackpiece}
-						,{empty,empty,empty,whitepiece,empty,empty,empty,empty,blackpiece,empty,empty,empty}
-						,{whitepiece,empty,empty,empty,empty,blackpiece,empty,empty,empty,empty,whitepiece,empty}
-						,{empty,empty,blackpiece,empty,empty,empty,empty,whitepiece,empty,empty,empty,empty}
-						,{empty,empty,empty,empty,whitepiece,empty,empty,empty,empty,blackpiece,empty,empty}
-						,{empty,whitepiece,empty,empty,empty,empty,blackpiece,empty,empty,empty,empty,whitepiece}
+		byte[][] ret2 = {{empty,whitepiece,empty,empty,empty,empty,blackpiece,empty,empty,empty,empty,whitepiece}
 						,{empty,empty,empty,blackpiece,empty,empty,empty,empty,whitepiece,empty,empty,empty}
 						,{blackpiece,empty,empty,empty,empty,whitepiece,empty,empty,empty,empty,blackpiece,empty}
 						,{empty,empty,whitepiece,empty,empty,empty,empty,blackpiece,empty,empty,empty,empty}
 						,{empty,empty,empty,empty,blackpiece,empty,empty,empty,empty,whitepiece,empty,empty}
 						,{empty,blackpiece,empty,empty,empty,empty,whitepiece,empty,empty,empty,empty,blackpiece}
-						,{empty,empty,empty,whitepiece,empty,empty,empty,empty,blackpiece,empty,empty,empty}};
+						,{empty,empty,empty,whitepiece,empty,empty,empty,empty,blackpiece,empty,empty,empty}
+						,{whitepiece,empty,empty,empty,empty,blackpiece,empty,empty,empty,empty,whitepiece,empty}
+						,{empty,empty,blackpiece,empty,empty,empty,empty,whitepiece,empty,empty,empty,empty}
+						,{empty,empty,empty,empty,whitepiece,empty,empty,empty,empty,blackpiece,empty,empty}
+						,{empty,whitepiece,empty,empty,empty,empty,blackpiece,empty,empty,empty,empty,whitepiece}
+						,{empty,empty,empty,blackpiece,empty,empty,empty,empty,whitepiece,empty,empty,empty}};
 
 		
 		Random rand = new Random(System.currentTimeMillis());

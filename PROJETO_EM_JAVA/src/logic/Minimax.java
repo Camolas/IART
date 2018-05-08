@@ -4,13 +4,22 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 public class Minimax {
-
+	
 	private static final int maxint = Integer.MAX_VALUE;
 	
 	private static final boolean MINIMIZER = true;
 	
 	private static final boolean MAXIMIZER = false;
-	
+
+	private void printBoard( byte[][] board) {
+
+		for(int i = 0; i < Game.boardsize; i++){
+			for(int j = 0; j < Game.boardsize; j++){
+				System.out.print((char)board[i][j]+"|");
+			}
+			System.out.println();
+		}
+	}
 	
 	public void applyMinimax(int depth, byte[][] board){
 		int alpha = -maxint;
@@ -19,7 +28,18 @@ public class Minimax {
 		int bminplay = 1;
 		int bmaxplay = 1;
 		
-		maximizer(depth, alpha, beta, board, null, bmaxplay, bminplay);
+		Stack<Integer[]> listOfPlays = new Stack<Integer[]>();
+		
+		maximizer(depth, alpha, beta, board, null, bmaxplay, bminplay, listOfPlays);
+		
+		int i = 0;
+		for(Integer[] ie: listOfPlays) {
+			System.out.println("X1: "+ ie[0] + " Y1: "+ ie[1]+ " | X2: "+ ie[2] +" Y2: "+ ie[3]);
+			i++;
+			board[ie[0]][ie[1]] = ((i%2)==0)?Game.blackpiece:Game.whitepiece;
+			board[ie[2]][ie[3]] = ((i%2)==0)?Game.blackpiece:Game.whitepiece;
+		}
+		printBoard(board);
 	}
 	
 	private boolean validPlay(int x, int y, byte[][] board, byte peca){
@@ -31,9 +51,16 @@ public class Minimax {
 		int[] auxs = {-1,1};
 		
 		for(int i = 0; i < 2; i++){
+			
+			int newX = x + auxs[i];
+			if(newX<0 || newX>=Game.boardsize) 
+				continue;
+			
 			for(int e = 0; e < 2; e++){
-				int newX = x + auxs[i];
+				
 				int newY = y + auxs[e];
+				if(newY<0 || newY>=Game.boardsize) 
+					continue;
 				
 				if(board[newX][newY] == peca){
 					if(board[x][newY] != peca && board[newX][y] != peca){
@@ -45,7 +72,9 @@ public class Minimax {
 		return true;
 	}
 	
-	private int iterate(int depth, int alpha, int beta, byte[][] board, int bmaxplay, int bminplay, boolean level){
+	private int iterate(int depth, int alpha, int beta, byte[][] board, int bmaxplay, int bminplay, boolean level, Stack<Integer[]> plays1){
+		
+		Stack<Integer[]> gPlays = null;
 		
 		byte peca = (level?Game.blackpiece:Game.whitepiece);
 		
@@ -65,19 +94,20 @@ public class Minimax {
 							continue;
 						
 						
-						if(!validPlay(X2, Y2, board, peca) ){
+						if(!validPlay(X2, Y2, board, peca) )
 							continue;
-						}
 
 						board[X1][Y1] = peca;
 								
 						board[X2][Y2] = peca;
 						
-						int coords[] = {X1, Y1, X2, Y2}; 
+						Stack<Integer[]> plays = new Stack<Integer[]>();
 						
+						Integer coords[] = new Integer[]{X1, Y1, X2, Y2};
+
 						int value = (level ? 
-										maximizer(depth - 1, alpha, beta, board, coords, bmaxplay, bminplay): 
-										minimizer(depth - 1, alpha, beta, board, coords, bmaxplay, bminplay));
+										maximizer(depth - 1, alpha, beta, board, coords, bmaxplay, bminplay, plays): 
+										minimizer(depth - 1, alpha, beta, board, coords, bmaxplay, bminplay, plays));
 						
 						board[X1][Y1] = Game.empty;
 											
@@ -85,28 +115,49 @@ public class Minimax {
 						
 						if(level == MINIMIZER){ 
 							if(value < beta){
+								gPlays = plays;
 								beta = value;  
 							}
 						}else
 							if(level == MAXIMIZER)
 								if(value > alpha){
+									gPlays = plays;
 									alpha = value;  
 								}
 							
-						if(alpha >= beta)
-							return (level?alpha:beta);
+						if(alpha >= beta) {
+							
+							return ((level==MINIMIZER)?alpha:beta);
+						}
+						
+						//System.out.println("------->");
 					}	
 				}	
 			}	
 		}
-		return alpha;
+		
+		if(gPlays!=null)
+			plays1.addAll(gPlays);
+		
+		return ((level==MINIMIZER)?beta:alpha);
 	}
 	
-	private int maximizer(int depth,int alpha,int beta, byte[][] board, int[] coords ,int bmaxplay,int bminplay){
+	private int maximizer(int depth,int alpha,int beta, byte[][] board, Integer[] coords ,int bmaxplay,int bminplay, Stack<Integer[]> plays){
 
+		if(coords!=null)
+		plays.push(coords.clone());
+		//printBoard(board);
+		
 		if(depth == 0){
 			return bmaxplay - bminplay;	
 		}
+		
+		//System.out.println("Max: " + depth);
+		//System.out.println("|");
+		//System.out.println("|");
+		//System.out.println("|");
+		//System.out.println("V");
+		
 		
 		int value = (coords==null ? bmaxplay : getLongestChain(board, coords, Game.whitepiece));
 
@@ -114,21 +165,27 @@ public class Minimax {
 			return Game.boardsize;
 		}
 		
-		//System.out.println("maximizer");
-		
 		if(bmaxplay < value){
 			bmaxplay = value;
 		}
 		
-		return iterate(depth, alpha, beta, board, bmaxplay, bminplay, MAXIMIZER);
-		
+		return iterate(depth, alpha, beta, board, bmaxplay, bminplay, MAXIMIZER, plays);
 	}
 	
-	public int minimizer(int depth,int alpha,int beta, byte[][] board, int[] coords ,int bmaxplay,int bminplay){
+	public int minimizer(int depth,int alpha,int beta, byte[][] board, Integer[] coords ,int bmaxplay,int bminplay, Stack<Integer[]> plays){
+
+		plays.push(coords.clone());
+		//printBoard(board);
 		
 		if(depth == 0){
 			return bmaxplay - bminplay;	
 		}
+		
+		//System.out.println("Min: " + depth);
+		//System.out.println("|");
+		//System.out.println("|");
+		//System.out.println("|");
+		//System.out.println("V");
 		
 		int value = (coords==null ? bminplay : getLongestChain(board, coords, Game.blackpiece));
 		
@@ -140,7 +197,7 @@ public class Minimax {
 			bminplay = value;
 		}
 		
-		return iterate(depth, alpha, beta, board, bmaxplay, bminplay, MINIMIZER);
+		return iterate(depth, alpha, beta, board, bmaxplay, bminplay, MINIMIZER, plays);
 	}	
 
 	private boolean listContainsCoords(ArrayList<Integer[]> list, Integer[] coordFind){
@@ -152,7 +209,7 @@ public class Minimax {
 		return false;
 	}
 	
-	public int getLongestChain(byte[][] board, int[] coords, byte peca){
+	public int getLongestChain(byte[][] board, Integer[] coords, byte peca){
 
 		
 		Integer[] firstPoint = {coords[0], coords[1]};
@@ -220,10 +277,11 @@ public class Minimax {
 				}
 			}
 		}
+
+		int hdis = (hMax - hMin) + 1;
+		int vdis = (vMax - vMin) + 1;
 		
-		//TODO: if(peca = preta) (returnar par com valor horizontal e valor vertical) else (returnar par com valor vertical e valor horizontal) 
-		
-		return 1;
+		return (Game.blackpiece==peca)? hdis : vdis;
 	}
 	
 	
