@@ -13,7 +13,7 @@ public class Game {
 	
 	public static final int boardsize = 12;
 	
-	public final static int depth = 5;
+	public final static int depth = 1;
 
 	private Minimax minimax = null;
 	
@@ -28,9 +28,48 @@ public class Game {
 	public Byte[][] getBoard(){
 		return board;
 	}
- 	
+	
 	public Stack<Integer[]> startAIvsAI() {
-		return this.minimax.applyMinimax(depth, this.board);
+		
+		Stack<Integer[]> playsRet = new Stack<Integer[]> ();
+		
+		Byte[][] boardAux = new Byte[boardsize][]; 
+		
+		int i = 0;
+		for(Byte[] row: board){
+			boardAux[i++] = row.clone();
+		}
+		i = 0;
+		
+		int value = 0;
+
+		Stack<Integer> valueS = new Stack<Integer>();
+		
+		while(Math.abs(value)!=boardsize){
+			Byte playPiece = ((i%2)==0)?blackpiece:whitepiece;
+			i++;
+			
+			Stack<Integer[]> plays = this.minimax.applyMinimax(depth, boardAux, valueS);
+
+			value = valueS.pop();
+			
+			Integer[] firstPlay = plays.elementAt(0);
+			boardAux[firstPlay[0]][firstPlay[1]] = playPiece;
+			boardAux[firstPlay[2]][firstPlay[3]] = playPiece;
+			
+			playsRet.push(firstPlay);
+			
+			for(int e = 0; e < boardsize; e++){
+				for(int j = 0; j < boardsize; j++){
+					System.out.print((char)(byte)boardAux[e][j] + "|");
+				}	
+				System.out.println();
+			}
+
+			System.out.println();
+		}
+		
+		return playsRet; 
 	}
 
 	private static Byte[][] generateBoard() {
@@ -63,7 +102,7 @@ public class Game {
 
 		
 		Random rand = new Random(System.currentTimeMillis());
-		
-		return ((rand.nextInt() % 2)==0)?ret1:ret2;
+		return ret1;
+		//return ((rand.nextInt() % 2)==0)?ret1:ret2;
 	}
 }

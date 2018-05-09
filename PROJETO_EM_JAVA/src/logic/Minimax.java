@@ -12,7 +12,7 @@ public class Minimax {
 	private static final boolean MAXIMIZER = false;
 
 	
-	public Stack<Integer[]> applyMinimax(int depth, Byte[][] board){
+	public Stack<Integer[]> applyMinimax(int depth, Byte[][] board, Stack<Integer> valueS){
 		int alpha = -maxint;
 		int beta = maxint;
 		
@@ -21,16 +21,16 @@ public class Minimax {
 		
 		Stack<Integer[]> listOfPlays = new Stack<Integer[]>();
 		
-		maximizer(depth, alpha, beta, board, null, bmaxplay, bminplay, listOfPlays);
+		valueS.push(maximizer(depth, alpha, beta, board, null, bmaxplay, bminplay, listOfPlays));
 		
-		
+		System.out.println(valueS.get(0));
 		
 		return listOfPlays;
 	}
 	
-	private boolean validPlay(int x, int y, Byte[][] board, byte peca){
+	private boolean validPlay(int y, int x, Byte[][] board, byte peca){
 		
-		if(board[x][y] != Game.empty){
+		if(board[y][x] != Game.empty){
 			return false;
 		}
 		
@@ -48,8 +48,8 @@ public class Minimax {
 				if(newY<0 || newY>=Game.boardsize) 
 					continue;
 				
-				if(board[newX][newY] == peca){
-					if(board[x][newY] != peca && board[newX][y] != peca){
+				if(board[newY][newX] == peca){
+					if(board[newY][x] != peca && board[y][newX] != peca){
 						return false;
 					}
 				}
@@ -68,7 +68,7 @@ public class Minimax {
 
 			for(int Y1 = 0; Y1 < Game.boardsize; Y1++){
 				
-				if(!validPlay(X1, Y1, board, peca) ){
+				if(!validPlay(Y1, X1, board, peca) ){
 					continue;
 				}
 				
@@ -80,24 +80,25 @@ public class Minimax {
 							continue;
 						
 						
-						if(!validPlay(X2, Y2, board, peca) )
+						if(!validPlay(Y2, X2, board, peca) )
 							continue;
 
-						board[X1][Y1] = peca;
+						board[Y1][X1] = peca;
 								
-						board[X2][Y2] = peca;
+						board[Y2][X2] = peca;
 						
 						Stack<Integer[]> plays = new Stack<Integer[]>();
 						
-						Integer coords[] = new Integer[]{X1, Y1, X2, Y2};
+						Integer coords[] = new Integer[]{Y1, X1, Y2, X2};
 
 						int value = (level ? 
 										maximizer(depth - 1, alpha, beta, board, coords, bmaxplay, bminplay, plays): 
 										minimizer(depth - 1, alpha, beta, board, coords, bmaxplay, bminplay, plays));
 						
-						board[X1][Y1] = Game.empty;
+						
+						board[Y1][X1] = Game.empty;
 											
-						board[X2][Y2] = Game.empty;
+						board[Y2][X2] = Game.empty;
 						
 						if(level == MINIMIZER){ 
 							if(value < beta){
@@ -121,7 +122,8 @@ public class Minimax {
 				}	
 			}	
 		}
-		
+
+	
 		if(gPlays!=null)
 			plays1.addAll(gPlays);
 		
@@ -131,12 +133,9 @@ public class Minimax {
 	private int maximizer(int depth,int alpha,int beta, Byte[][] board, Integer[] coords ,int bmaxplay,int bminplay, Stack<Integer[]> plays){
 
 		if(coords!=null)
-		plays.push(coords.clone());
+			plays.push(coords.clone());
 		//printBoard(board);
 		
-		if(depth == 0){
-			return bmaxplay - bminplay;	
-		}
 		
 		//System.out.println("Max: " + depth);
 		//System.out.println("|");
@@ -145,7 +144,7 @@ public class Minimax {
 		//System.out.println("V");
 		
 		
-		int value = (coords==null ? bmaxplay : getLongestChain(board, coords, Game.whitepiece));
+		int value = (coords==null ? bmaxplay : getLongestChainAux(board, coords, Game.blackpiece));
 
 		if(value == Game.boardsize){
 			return Game.boardsize;
@@ -154,6 +153,9 @@ public class Minimax {
 		if(bmaxplay < value){
 			bmaxplay = value;
 		}
+
+		if(depth == 0)
+			return bmaxplay - bminplay;
 		
 		return iterate(depth, alpha, beta, board, bmaxplay, bminplay, MAXIMIZER, plays);
 	}
@@ -163,9 +165,6 @@ public class Minimax {
 		plays.push(coords.clone());
 		//printBoard(board);
 		
-		if(depth == 0){
-			return bmaxplay - bminplay;	
-		}
 		
 		//System.out.println("Min: " + depth);
 		//System.out.println("|");
@@ -173,7 +172,7 @@ public class Minimax {
 		//System.out.println("|");
 		//System.out.println("V");
 		
-		int value = (coords==null ? bminplay : getLongestChain(board, coords, Game.blackpiece));
+		int value = (coords==null ? bminplay : getLongestChainAux(board, coords, Game.whitepiece));
 		
 		if(value == Game.boardsize){
 			return -Game.boardsize;
@@ -181,6 +180,11 @@ public class Minimax {
 		
 		if(bminplay< value){
 			bminplay = value;
+		}
+
+		
+		if(depth == 0){
+			return bmaxplay - bminplay;
 		}
 		
 		return iterate(depth, alpha, beta, board, bmaxplay, bminplay, MINIMIZER, plays);
@@ -195,18 +199,25 @@ public class Minimax {
 		return false;
 	}
 	
-	public int getLongestChain(Byte[][] board, Integer[] coords, byte peca){
+	private int getLongestChainAux(Byte[][] board, Integer[] coords, byte peca){
+		
+		int a1 = getLongestChain(board, new Integer[]{coords[0],coords[1]}, peca);
+		
+		int a2 = getLongestChain(board, new Integer[]{coords[2],coords[3]}, peca);
+		
+		return (a1>a2)?a1:a2;
+		
+	}
+	
+	private int getLongestChain(Byte[][] board, Integer[] coords, byte peca){
 
 		
-		Integer[] firstPoint = {coords[0], coords[1]};
-		
-		Integer[] secondPoint = {coords[2], coords[3]};
+		Integer[] point = {coords[0], coords[1]};
 		
 		ArrayList<Integer[]> steppedOn = new ArrayList<Integer[]>();
 		Stack<Integer[]> explore = new Stack<Integer[]>();
 		
-		explore.push(firstPoint);
-		explore.push(secondPoint);
+		explore.push(point);
 		
 		int hMax = -1;
 		int hMin = Game.boardsize + 1;
@@ -215,11 +226,12 @@ public class Minimax {
 		int vMin = Game.boardsize + 1;
 		
 		while(explore.size()!=0){
+			
 			Integer[] current = explore.pop();
 			steppedOn.add(current);
 			
-			int X = current[0];
-			int Y = current[1];
+			int Y = current[0];
+			int X = current[1];
 			
 			if(X > hMax)
 				hMax = X;
@@ -235,30 +247,30 @@ public class Minimax {
 			
 			//TODO: Change search to matrix of nodes with visited variable
 			
-			if(X>0){
-				Integer[] tryP = new Integer[]{X-1,Y};
-				if(board[X-1][Y] == peca && listContainsCoords(steppedOn, tryP) ){
+			if(Y>0){
+				Integer[] tryP = new Integer[]{Y-1,X};
+				if(board[Y-1][X] == peca && !listContainsCoords(steppedOn, tryP) ){
 					explore.push(tryP); 
 				}
 			}
 			
-			if(Y>0){
-				Integer[] tryP = new Integer[]{X,Y-1};
-				if(board[X][Y-1] == peca && listContainsCoords(steppedOn, tryP) ){
+			if(X>0){
+				Integer[] tryP = new Integer[]{Y,X-1};
+				if(board[Y][X-1] == peca && !listContainsCoords(steppedOn, tryP) ){
 					explore.push(tryP);
 				}
 			}
 			
-			if(X < (Game.boardsize-1)){
-				Integer[] tryP = new Integer[]{X+1,Y};
-				if(board[X+1][Y] == peca && listContainsCoords(steppedOn, tryP) ){
+			if(Y < (Game.boardsize-1)){
+				Integer[] tryP = new Integer[]{Y+1,X};
+				if(board[Y+1][X] == peca && !listContainsCoords(steppedOn, tryP) ){
 					explore.push(tryP);
 				}
 			}
 
-			if(Y < (Game.boardsize-1)){
-				Integer[] tryP = new Integer[]{X,Y+1};
-				if(board[X][Y+1] == peca && listContainsCoords(steppedOn, tryP) ){
+			if(X < (Game.boardsize-1)){
+				Integer[] tryP = new Integer[]{Y,X+1};
+				if(board[Y][X+1] == peca && !listContainsCoords(steppedOn, tryP) ){
 					explore.push(tryP);
 				}
 			}
@@ -266,7 +278,7 @@ public class Minimax {
 
 		int hdis = (hMax - hMin) + 1;
 		int vdis = (vMax - vMin) + 1;
-		
+
 		return (Game.blackpiece==peca)? hdis : vdis;
 	}
 	
