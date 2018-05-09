@@ -1,6 +1,7 @@
 package logic;
 
 import java.util.Random;
+import java.util.Stack;
 
 public class Game {
 
@@ -14,17 +15,26 @@ public class Game {
 	
 	public final static int depth = 3;
 
-	public static void main(String[] args) {
-		Minimax minimax = new Minimax();
+	private Minimax minimax = null;
+	
+	private Byte[][] board = null;
+	
+	public Game(){
+		minimax = new Minimax();
 		
-		byte[][] board = null;
-		
-		board = generateBoard();		
-		minimax.applyMinimax(depth, board);
+		board = generateBoard();
+	}
+	
+	public Byte[][] getBoard(){
+		return board;
+	}
+ 	
+	public Stack<Integer[]> startAIvsAI() {
+		return this.minimax.applyMinimax(depth, this.board);
 	}
 
-	private static byte[][] generateBoard() {
-		byte[][] ret1 = {{empty,blackpiece,empty,empty,empty,empty,whitepiece,empty,empty,empty,empty,blackpiece}
+	private static Byte[][] generateBoard() {
+		Byte[][] ret1 = {{empty,blackpiece,empty,empty,empty,empty,whitepiece,empty,empty,empty,empty,blackpiece}
 						,{empty,empty,empty,whitepiece,empty,empty,empty,empty,blackpiece,empty,empty,empty}
 						,{whitepiece,empty,empty,empty,empty,blackpiece,empty,empty,empty,empty,whitepiece,empty}
 						,{empty,empty,blackpiece,empty,empty,empty,empty,whitepiece,empty,empty,empty,empty}
@@ -38,7 +48,7 @@ public class Game {
 						,{empty,empty,empty,whitepiece,empty,empty,empty,empty,blackpiece,empty,empty,empty}};
 		
 
-		byte[][] ret2 = {{empty,whitepiece,empty,empty,empty,empty,blackpiece,empty,empty,empty,empty,whitepiece}
+		Byte[][] ret2 = {{empty,whitepiece,empty,empty,empty,empty,blackpiece,empty,empty,empty,empty,whitepiece}
 						,{empty,empty,empty,blackpiece,empty,empty,empty,empty,whitepiece,empty,empty,empty}
 						,{blackpiece,empty,empty,empty,empty,whitepiece,empty,empty,empty,empty,blackpiece,empty}
 						,{empty,empty,whitepiece,empty,empty,empty,empty,blackpiece,empty,empty,empty,empty}

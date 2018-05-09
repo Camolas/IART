@@ -11,17 +11,8 @@ public class Minimax {
 	
 	private static final boolean MAXIMIZER = false;
 
-	private void printBoard( byte[][] board) {
-
-		for(int i = 0; i < Game.boardsize; i++){
-			for(int j = 0; j < Game.boardsize; j++){
-				System.out.print((char)board[i][j]+"|");
-			}
-			System.out.println();
-		}
-	}
 	
-	public void applyMinimax(int depth, byte[][] board){
+	public Stack<Integer[]> applyMinimax(int depth, Byte[][] board){
 		int alpha = -maxint;
 		int beta = maxint;
 		
@@ -32,17 +23,12 @@ public class Minimax {
 		
 		maximizer(depth, alpha, beta, board, null, bmaxplay, bminplay, listOfPlays);
 		
-		int i = 0;
-		for(Integer[] ie: listOfPlays) {
-			System.out.println("X1: "+ ie[0] + " Y1: "+ ie[1]+ " | X2: "+ ie[2] +" Y2: "+ ie[3]);
-			i++;
-			board[ie[0]][ie[1]] = ((i%2)==0)?Game.blackpiece:Game.whitepiece;
-			board[ie[2]][ie[3]] = ((i%2)==0)?Game.blackpiece:Game.whitepiece;
-		}
-		printBoard(board);
+		
+		
+		return listOfPlays;
 	}
 	
-	private boolean validPlay(int x, int y, byte[][] board, byte peca){
+	private boolean validPlay(int x, int y, Byte[][] board, byte peca){
 		
 		if(board[x][y] != Game.empty){
 			return false;
@@ -72,7 +58,7 @@ public class Minimax {
 		return true;
 	}
 	
-	private int iterate(int depth, int alpha, int beta, byte[][] board, int bmaxplay, int bminplay, boolean level, Stack<Integer[]> plays1){
+	private int iterate(int depth, int alpha, int beta, Byte[][] board, int bmaxplay, int bminplay, boolean level, Stack<Integer[]> plays1){
 		
 		Stack<Integer[]> gPlays = null;
 		
@@ -142,7 +128,7 @@ public class Minimax {
 		return ((level==MINIMIZER)?beta:alpha);
 	}
 	
-	private int maximizer(int depth,int alpha,int beta, byte[][] board, Integer[] coords ,int bmaxplay,int bminplay, Stack<Integer[]> plays){
+	private int maximizer(int depth,int alpha,int beta, Byte[][] board, Integer[] coords ,int bmaxplay,int bminplay, Stack<Integer[]> plays){
 
 		if(coords!=null)
 		plays.push(coords.clone());
@@ -172,7 +158,7 @@ public class Minimax {
 		return iterate(depth, alpha, beta, board, bmaxplay, bminplay, MAXIMIZER, plays);
 	}
 	
-	public int minimizer(int depth,int alpha,int beta, byte[][] board, Integer[] coords ,int bmaxplay,int bminplay, Stack<Integer[]> plays){
+	public int minimizer(int depth,int alpha,int beta, Byte[][] board, Integer[] coords ,int bmaxplay,int bminplay, Stack<Integer[]> plays){
 
 		plays.push(coords.clone());
 		//printBoard(board);
@@ -209,7 +195,7 @@ public class Minimax {
 		return false;
 	}
 	
-	public int getLongestChain(byte[][] board, Integer[] coords, byte peca){
+	public int getLongestChain(Byte[][] board, Integer[] coords, byte peca){
 
 		
 		Integer[] firstPoint = {coords[0], coords[1]};
