@@ -1,7 +1,9 @@
 package gui;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -9,6 +11,10 @@ import java.util.Collections;
 import java.util.Stack;
 
 import javax.swing.*;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
 import logic.Game; 
@@ -32,7 +38,28 @@ public class GUI {
 		runBoardPlays(plays);
 	}
 	
-	
+	 private static DefaultTableCellRenderer getRenderer() {
+	        return new DefaultTableCellRenderer(){
+	            @Override
+	            public Component getTableCellRendererComponent(JTable table,
+	                    Object value, boolean isSelected, boolean hasFocus,
+	                    int row, int column) {
+	                Component tableCellRendererComponent = super.getTableCellRendererComponent(table, value, isSelected, hasFocus,row, column);
+	                if("X".equals(value)){
+	                    tableCellRendererComponent.setBackground(Color.WHITE);
+	                    tableCellRendererComponent.setForeground(Color.WHITE);
+	                } else  if("0".equals(value)){
+	                    tableCellRendererComponent.setBackground(Color.BLACK);
+	                    tableCellRendererComponent.setForeground(Color.BLACK);
+	                } else {
+	                    tableCellRendererComponent.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
+	                }
+	                return tableCellRendererComponent;
+	            }
+	        };
+	    }
+
+	 
 	private static void runBoardPlays(Stack<Integer[]> plays){
 		
 		
@@ -43,33 +70,28 @@ public class GUI {
 			
 			String playPiece = "" + (((i%2)==0)?(char)Game.blackpiece:(char)Game.whitepiece);
 			
-			javax.swing.SwingUtilities.invokeLater(new Runnable() {
-	            public void run() {
-	            	board[ie[0]][ie[1]] = playPiece; 	
-		        	board[ie[2]][ie[3]] = playPiece;
-					
-					boardPanel.repaint();
-					boardFrame.repaint();
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-	            }
-	        });	
+        	board[ie[0]][ie[1]]= playPiece; 	
+        	board[ie[2]][ie[3]] = playPiece;
+
+        	
+        	
+			boardPanel.getComponent(0).repaint();
+			boardPanel.getComponent(1).repaint();
+			boardPanel.repaint();
+			boardFrame.repaint();
+			
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
 			
 		}
 		
-		i = 0;
-		for(Integer[] ie: plays) {
-
-			i++;
-			board[ie[0]][ie[1]] = "" + (char)Game.empty;
-			board[ie[2]][ie[3]] = "" + (char)Game.empty;
-		}
-		
+		boardPanel.repaint();
+		boardFrame.repaint();
 		
 	}
 	
@@ -109,10 +131,10 @@ public class GUI {
         boardFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         boardFrame.setLocationRelativeTo(null);
         boardFrame.pack();
-        boardFrame.setSize(540, 300);
+        boardFrame.setSize(540, 600);
         
         boardPanel = new JPanel();
-        boardPanel.setLayout(new BoxLayout(boardPanel, BoxLayout.Y_AXIS));
+        boardPanel.setLayout(new BoxLayout(boardPanel, BoxLayout.PAGE_AXIS));
         boardPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));   
         boardPanel.setBackground(new Color(245,222,179));
         
@@ -126,9 +148,13 @@ public class GUI {
         
         tabel = new  JTable(board,columns);
         tabel.setBackground(new Color(222,184,135));
-
+        tabel.setRowHeight(40);
+        
+        tabel.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        
         for(TableColumn cl :Collections.list(tabel.getColumnModel().getColumns())){
-        	cl.sizeWidthToFit();
+        	cl.setPreferredWidth(25);
+        	cl.setCellRenderer(getRenderer());
         }
         tabel.updateUI();
         tabel.repaint();
@@ -166,35 +192,41 @@ public class GUI {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				cleanBoard();
 				menuFrame.setVisible(false);
 				boardFrame.setVisible(true);
-				javax.swing.SwingUtilities.invokeLater(new Runnable() {
+				Thread thread = new Thread(new Runnable() {
 		            public void run() {
 		            	generatePlays();
 		            }
 		        });
-				
+				thread.start();
 			}
         	
         });
     }
- 
-    public static void main(String[] args) {
-		
-    	game = new Game();
+	
+	private static void cleanBoard(){
 
-		board = new String[Game.boardsize][]; 
-		
 		Byte[][] boardOri = game.getBoard();
 		
 		for(int i = 0; i < Game.boardsize; i++){
 			board[i] = new String[Game.boardsize];
 			for(int j = 0; j < Game.boardsize; j++){
 				char ch = (char)((byte)boardOri[i][j]);
-				board[i][j] = "" + ch; 
+				board[i][j] = "" + ch;
 			}
 		}
-    	
+	}
+ 
+    public static void main(String[] args) {
+		
+    	game = new Game();
+
+		board = new String[Game.boardsize][Game.boardsize]; 
+		
+		cleanBoard();
+		
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
             	showMenu();

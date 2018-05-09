@@ -13,7 +13,7 @@ public class Game {
 	
 	public static final int boardsize = 12;
 	
-	public final static int depth = 3;
+	public final static int depth = 5;
 
 	private Minimax minimax = null;
 	
