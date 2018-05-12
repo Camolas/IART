@@ -68,17 +68,15 @@ public class Minimax {
 
 			for(int Y1 = 0; Y1 < Game.boardsize; Y1++){
 				
-				if(!validPlay(Y1, X1, board, peca) ){
-					continue;
-				}
-				
 				for(int X2 = 0; X2 < Game.boardsize; X2++){
 
 					for(int Y2 = 0; (Y2 < Game.boardsize); Y2++){
 						
 						if(X1 == X2 && Y1 == Y2)
 							continue;
-						
+				
+						if(!validPlay(Y1, X1, board, peca) )
+							continue;
 						
 						if(!validPlay(Y2, X2, board, peca) )
 							continue;
