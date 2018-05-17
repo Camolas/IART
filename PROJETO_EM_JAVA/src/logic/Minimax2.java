@@ -6,7 +6,9 @@ import java.util.Stack;
 public class Minimax2 {
 
 	private static final int MAX_INT = Integer.MAX_VALUE;
-	private Board board;
+
+	private Board board = null;
+	
 	private byte maximizingPiece;
 	private byte minimizingPiece;
 
@@ -68,7 +70,7 @@ public class Minimax2 {
 			int biggestChainMin) {
 		if ((depth == 0) || (biggestChainMax == board.getBoardSize()) || (biggestChainMin == board.getBoardSize())) {
 			// board.printBoard();
-			return new Node(evaluate(biggestChainMax, biggestChainMin), biggestChainMax, biggestChainMin);
+			return new Node(evaluate(board, biggestChainMax, biggestChainMin), biggestChainMax, biggestChainMin);
 		}
 
 		Node value;
@@ -83,7 +85,7 @@ public class Minimax2 {
 		return value;
 	}
 
-	private int evaluate(int biggestChainMax, int biggestChainMin) {
+	private int evaluate(Board board, int biggestChainMax, int biggestChainMin) {
 		if (biggestChainMax == board.getBoardSize())
 			return biggestChainMax;
 
@@ -167,6 +169,16 @@ public class Minimax2 {
 
 						node.biggestChainMax = Math.max(biggestChainMax,
 								board.getLongestChain(new Point(x1, y1), new Point(x2, y2), maximizingPiece));
+						
+						//Temporary but perfect
+						if(depth == Game.depth && board.getLongestChain(new Point(x1, y1), new Point(x2, y2), maximizingPiece) == board.getBoardSize()){
+							lastPlayPiece1 = new Point(x1, y1);
+							lastPlayPiece2 = new Point(x2, y2);
+							this.endgame = true;
+							return node;
+						}
+							
+						
 					
 
 						int currValNode = alphabeta(board, depth - 1, alfa, beta, false, node.biggestChainMax,

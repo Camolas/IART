@@ -8,6 +8,8 @@ import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Collections;
 import java.util.Stack;
 
@@ -15,6 +17,7 @@ import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
@@ -33,10 +36,9 @@ public class GUI {
 	
 	private static String[][] board = null;
 	
-	private static void generatePlays(){
-		
-		runBoardPlays();
-	}
+	private static int clickCount = 2;
+	
+	private static Integer[][] playPos = new Integer[2][];
 	
 	 private static DefaultTableCellRenderer getRenderer() {
 	        return new DefaultTableCellRenderer(){
@@ -59,8 +61,88 @@ public class GUI {
 	        };
 	    }
 
-	 
-	private static void runBoardPlays(){
+
+
+	private static void pvp() {
+		int i = 0;
+		byte playPiece;
+		Point[] play = null;
+		do{
+
+			
+			if((i++%2)==0)
+				playPiece = Game.blackpiece;
+			else
+				playPiece = Game.whitepiece;
+			
+			do{
+				System.out.println("Try a valid play!");
+				play = getCoords();					
+			}while(!game.getBoard().validPlay(play[0],play[1], playPiece));
+			game.setPieces(playPiece, play[0], play[1]);
+				
+        	board[play[0].y][play[0].x] = ""+(char)playPiece; 	
+        	board[play[1].y][play[1].x] = ""+(char)playPiece;
+        	
+			boardPanel.getComponent(0).repaint();
+			boardPanel.getComponent(1).repaint();
+			boardPanel.repaint();
+			boardFrame.repaint();
+			
+		}while(!game.checkEndGame(play[0], play[1], playPiece));
+		
+		boardPanel.repaint();
+		boardFrame.repaint();
+	}
+
+
+	private static void pvsai() {
+
+		int i = 0;
+		byte playPiece;
+		Point[] play = null;
+		do{
+
+			
+			if((i++%2)==0){
+				playPiece = Game.blackpiece;
+				do{
+					System.out.println("Try a valid play!");
+					play = getCoords();					
+				}while(!game.getBoard().validPlay(play[0],play[1], playPiece));
+				game.setPieces(playPiece, play[0], play[1]);
+			}
+			else{
+				playPiece = Game.whitepiece;
+				play = game.getPlay(playPiece);
+			}
+			
+        	board[play[0].y][play[0].x] = ""+(char)playPiece; 	
+        	board[play[1].y][play[1].x] = ""+(char)playPiece;
+        	
+			boardPanel.getComponent(0).repaint();
+			boardPanel.getComponent(1).repaint();
+			boardPanel.repaint();
+			boardFrame.repaint();
+			
+		}while(!game.checkEndGame(play[0], play[1], playPiece));
+		
+		boardPanel.repaint();
+		boardFrame.repaint();
+	}
+		
+	private static Point[] getCoords() {
+		clickCount = 0;
+		while(clickCount!=2){
+			System.out.flush();
+		}
+		
+		return new Point[]{new Point(playPos[0][0],playPos[0][1]),new Point(playPos[1][0],playPos[1][1])};
+	}
+
+
+
+	private static void aivsai(){
 		
 		
 		int i = 0;
@@ -166,9 +248,28 @@ public class GUI {
         boardPanel.add(tabel);
         boardPanel.add(Box.createRigidArea(new Dimension(0,25)));
         boardPanel.add(backToMenu);
-        
-        
 
+        for (int c = 0; c < tabel.getColumnCount(); c++)
+        {
+            Class<?> col_class = tabel.getColumnClass(c);
+            tabel.setDefaultEditor(col_class, null);        // remove editor
+        }
+        
+        tabel.addMouseListener(new MouseAdapter() {
+        	  public void mouseClicked(MouseEvent e) {
+        	    if (e.getClickCount() == 1) {
+        	      JTable target = (JTable)e.getSource();
+        	      int row = target.getSelectedRow();
+        	      int column = target.getSelectedColumn();
+        	      
+        	      if(clickCount<2){
+        	    	  System.out.println(column+":" + row);
+        	    	  playPos[clickCount++] = new Integer[]{column, row};
+        	      }
+
+        	    }
+        	  }
+        	});
         
         menuFrame.getContentPane().add(buttonPanel);
         boardFrame.getContentPane().add(boardPanel);
@@ -188,6 +289,38 @@ public class GUI {
         	
         });
         
+        playervsaiButton.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				cleanBoard();
+				menuFrame.setVisible(false);
+				boardFrame.setVisible(true);
+				Thread thread = new Thread(new Runnable() {
+		            public void run() {
+		            	pvsai();
+		            }
+		        });
+				thread.start();
+			}        	
+        });
+        
+        playervsplayerButton.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				cleanBoard();
+				menuFrame.setVisible(false);
+				boardFrame.setVisible(true);
+				Thread thread = new Thread(new Runnable() {
+		            public void run() {
+		            	pvp();
+		            }
+		        });
+				thread.start();
+			}        	
+        });
+        
         aivsaiButton.addActionListener(new ActionListener(){
 
 			@Override
@@ -197,12 +330,11 @@ public class GUI {
 				boardFrame.setVisible(true);
 				Thread thread = new Thread(new Runnable() {
 		            public void run() {
-		            	generatePlays();
+		            	aivsai();
 		            }
 		        });
 				thread.start();
-			}
-        	
+			}        	
         });
     }
 	

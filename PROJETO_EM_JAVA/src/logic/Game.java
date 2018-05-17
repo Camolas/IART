@@ -36,19 +36,18 @@ public class Game {
 		
 		minimax = new Minimax2(board, piece);
 		minimax.applyAlphaBeta();
-		
-		board.setPiece(minimax.lastPlayPiece1, piece);
-		board.setPiece(minimax.lastPlayPiece2, piece);
-		
-		board.printBoard();
+
+		setPieces(piece, minimax.lastPlayPiece1, minimax.lastPlayPiece2);
 		
 		return new Point[]{minimax.lastPlayPiece1, minimax.lastPlayPiece2};
 	}
 	
+	public void setPieces(byte piece, Point point1, Point point2){
+		board.setPiece(point1, piece);
+		board.setPiece(point2, piece);
+	}
+	
 	public boolean checkEndGame(Point point1, Point point2, byte piece){
-
-		
-		System.out.println(board.getLongestChain(point1, point2, piece));
 		return (boardsize == board.getLongestChain(point1, point2, piece));
 	}
 
