@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collections;
@@ -17,6 +18,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
+import logic.Board;
 import logic.Game; 
 
 public class GUI {
@@ -33,9 +35,7 @@ public class GUI {
 	
 	private static void generatePlays(){
 		
-		Stack<Integer[]> plays = game.startAIvsAI();
-		
-		runBoardPlays(plays);
+		runBoardPlays();
 	}
 	
 	 private static DefaultTableCellRenderer getRenderer() {
@@ -60,25 +60,14 @@ public class GUI {
 	    }
 
 	 
-	private static void runBoardPlays(Stack<Integer[]> plays){
+	private static void runBoardPlays(){
 		
 		
 		int i = 0;
-		for(Integer[] ie: plays) {
+		byte playPiece;
+		Point[] play = null;
+		do{
 
-			i++;
-			
-			String playPiece = "" + (((i%2)==0)?(char)Game.blackpiece:(char)Game.whitepiece);
-			
-        	board[ie[0]][ie[1]]= playPiece; 	
-        	board[ie[2]][ie[3]] = playPiece;
-
-        	
-        	
-			boardPanel.getComponent(0).repaint();
-			boardPanel.getComponent(1).repaint();
-			boardPanel.repaint();
-			boardFrame.repaint();
 			
 			try {
 				Thread.sleep(2000);
@@ -86,9 +75,20 @@ public class GUI {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-
 			
-		}
+			playPiece = ((i++%2)==0)?Game.blackpiece:Game.whitepiece;
+			
+			play = game.getPlay(playPiece);
+			
+        	board[play[0].y][play[0].x] = ""+(char)playPiece; 	
+        	board[play[1].y][play[1].x] = ""+(char)playPiece;
+        	
+			boardPanel.getComponent(0).repaint();
+			boardPanel.getComponent(1).repaint();
+			boardPanel.repaint();
+			boardFrame.repaint();
+			
+		}while(!game.checkEndGame(play[0], play[1], playPiece));
 		
 		boardPanel.repaint();
 		boardFrame.repaint();
@@ -208,12 +208,13 @@ public class GUI {
 	
 	private static void cleanBoard(){
 
-		Byte[][] boardOri = game.getBoard();
+		game.resetBoard();
+		Board boardOri = game.getBoard();
 		
 		for(int i = 0; i < Game.boardsize; i++){
 			board[i] = new String[Game.boardsize];
 			for(int j = 0; j < Game.boardsize; j++){
-				char ch = (char)((byte)boardOri[i][j]);
+				char ch = (char)(boardOri.getPiece(j ,i));
 				board[i][j] = "" + ch;
 			}
 		}

@@ -74,9 +74,12 @@ public class Minimax {
 						
 						if(X1 == X2 && Y1 == Y2)
 							continue;
-				
-						if(!validPlay(Y1, X1, board, peca) )
+						
+
+						
+						if(!validPlay(Y1, X1, board, peca) ){
 							continue;
+						}
 						
 						if(!validPlay(Y2, X2, board, peca) )
 							continue;
