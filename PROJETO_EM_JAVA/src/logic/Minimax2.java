@@ -87,13 +87,14 @@ public class Minimax2 {
 
 	private int evaluate(Board board, int biggestChainMax, int biggestChainMin) {
 		if (biggestChainMax == board.getBoardSize())
-			return biggestChainMax;
+			return biggestChainMax* 10000;
 
 		if (biggestChainMin == board.getBoardSize())
-			return -biggestChainMin;
+			return -biggestChainMin* 10000;
 
-		return biggestChainMax - biggestChainMin;
-		//return biggestChainMax;
+		return biggestChainMax * 10000 + (biggestChainMax - biggestChainMin + board.getBoardSize()) * 100
+				+ (-biggestChainMin + board.getBoardSize());
+		// return biggestChainMax;
 
 	}
 
