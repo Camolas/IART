@@ -108,7 +108,7 @@ public class Minimax2 {
 				innerloop: for (int x2 = 0; x2 < Game.boardsize; x2++)
 					for (int y2 = y1+1; y2 < Game.boardsize; y2++) {
 
-						if(x1 == x2 && y2 <= y1)
+						if(x1 == x2 && y2 < y1)
 							continue;
 						
 						if(x2<x1)
@@ -155,7 +155,7 @@ public class Minimax2 {
 					for (int y2 = 0; y2 < Game.boardsize; y2++) {
 
 
-						if(x1 == x2 && y2 <= y1)
+						if(x1 == x2 && y2 < y1)
 							continue;
 						
 						if(x2<x1)
