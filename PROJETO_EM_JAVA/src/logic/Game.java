@@ -12,9 +12,9 @@ public class Game {
 	
 	public static final byte whitepiece = '0';
 	
-	public static final int boardsize = 8;
+	public static int boardsize = 8;
 	
-	public final static int depth = 3;
+	public static int depth = 3;
 
 	private Minimax2 minimax = null;
 	
