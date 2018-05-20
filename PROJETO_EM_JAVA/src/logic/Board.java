@@ -4,11 +4,22 @@ import java.awt.Point;
 import java.util.Arrays;
 import java.util.Stack;
 
+/**
+ * The Class Board.
+ */
 public class Board {
 
+	/** The board. */
 	public byte[][] board;
+	
+	/** The board size. */
 	private int boardSize;
 
+	/**
+	 * Instantiates a new board.
+	 *
+	 * @param boardSize the board size
+	 */
 	public Board(int boardSize) {
 
 		board = new byte[boardSize][boardSize];
@@ -18,6 +29,9 @@ public class Board {
 
 	}
 
+	/**
+	 * Prints the board.
+	 */
 	public void printBoard() {
 		for (int rowIndex = 0; rowIndex < board.length; rowIndex++) {
 			for (int columnIndex = 0; columnIndex < board.length; columnIndex++)
@@ -27,115 +41,61 @@ public class Board {
 		System.out.println();
 	}
 
-	public static void main(String[] args) {
-		// just for testing
-		Board board = new Board(12);
+	
 
-		board.printBoard();
-
-		byte[][] board2 = {
-				{ Game.empty, Game.blackpiece, Game.blackpiece, Game.empty, Game.empty, Game.empty, Game.whitepiece,
-						Game.empty, Game.empty, Game.empty, Game.empty, Game.blackpiece },
-				{ Game.empty, Game.blackpiece, Game.empty, Game.whitepiece, Game.empty, Game.empty, Game.empty,
-						Game.empty, Game.blackpiece, Game.empty, Game.empty, Game.empty },
-				{ Game.whitepiece, Game.blackpiece, Game.blackpiece, Game.empty, Game.empty, Game.blackpiece,
-						Game.empty, Game.empty, Game.empty, Game.empty, Game.whitepiece, Game.empty },
-				{ Game.empty, Game.empty, Game.blackpiece, Game.empty, Game.empty, Game.empty, Game.empty,
-						Game.whitepiece, Game.empty, Game.empty, Game.empty, Game.empty },
-				{ Game.empty, Game.empty, Game.empty, Game.empty, Game.whitepiece, Game.empty, Game.empty, Game.empty,
-						Game.empty, Game.blackpiece, Game.empty, Game.empty },
-				{ Game.empty, Game.whitepiece, Game.empty, Game.empty, Game.empty, Game.empty, Game.blackpiece,
-						Game.empty, Game.empty, Game.empty, Game.empty, Game.whitepiece },
-				{ Game.empty, Game.empty, Game.empty, Game.blackpiece, Game.empty, Game.empty, Game.empty, Game.empty,
-						Game.whitepiece, Game.empty, Game.empty, Game.empty },
-				{ Game.blackpiece, Game.empty, Game.empty, Game.empty, Game.empty, Game.whitepiece, Game.empty,
-						Game.empty, Game.empty, Game.empty, Game.blackpiece, Game.empty },
-				{ Game.empty, Game.empty, Game.whitepiece, Game.empty, Game.empty, Game.empty, Game.empty,
-						Game.blackpiece, Game.empty, Game.empty, Game.empty, Game.empty },
-				{ Game.empty, Game.empty, Game.empty, Game.empty, Game.blackpiece, Game.empty, Game.empty, Game.empty,
-						Game.empty, Game.whitepiece, Game.empty, Game.empty },
-				{ Game.empty, Game.blackpiece, Game.empty, Game.empty, Game.empty, Game.empty, Game.whitepiece,
-						Game.empty, Game.empty, Game.empty, Game.empty, Game.blackpiece },
-				{ Game.empty, Game.empty, Game.empty, Game.whitepiece, Game.empty, Game.empty, Game.empty, Game.empty,
-						Game.blackpiece, Game.empty, Game.empty, Game.empty } };
-
-		// byte[][] board2 = {
-		// { Game.empty, Game.blackpiece, Game.empty, Game.empty, Game.empty,
-		// Game.empty, Game.whitepiece,
-		// Game.empty, Game.empty, Game.empty, Game.empty, Game.blackpiece },
-		// { Game.empty, Game.empty, Game.empty, Game.whitepiece, Game.empty,
-		// Game.empty, Game.empty, Game.empty,
-		// Game.blackpiece, Game.empty, Game.empty, Game.empty },
-		// { Game.whitepiece, Game.empty, Game.empty, Game.empty, Game.empty,
-		// Game.blackpiece, Game.empty,
-		// Game.empty, Game.empty, Game.empty, Game.whitepiece, Game.empty },
-		// { Game.empty, Game.empty, Game.blackpiece, Game.empty, Game.empty,
-		// Game.empty, Game.empty,
-		// Game.whitepiece, Game.empty, Game.empty, Game.empty, Game.empty },
-		// { Game.empty, Game.empty, Game.empty, Game.empty, Game.whitepiece,
-		// Game.empty, Game.empty, Game.empty,
-		// Game.empty, Game.blackpiece, Game.empty, Game.empty },
-		// { Game.empty, Game.whitepiece, Game.empty, Game.empty, Game.empty,
-		// Game.empty, Game.blackpiece,
-		// Game.empty, Game.empty, Game.empty, Game.empty, Game.whitepiece },
-		// { Game.empty, Game.empty, Game.empty, Game.blackpiece, Game.empty,
-		// Game.empty, Game.empty, Game.empty,
-		// Game.whitepiece, Game.empty, Game.empty, Game.empty },
-		// { Game.blackpiece, Game.empty, Game.empty, Game.empty, Game.empty,
-		// Game.whitepiece, Game.empty,
-		// Game.empty, Game.empty, Game.empty, Game.blackpiece, Game.empty },
-		// { Game.empty, Game.empty, Game.whitepiece, Game.empty, Game.empty,
-		// Game.empty, Game.empty,
-		// Game.blackpiece, Game.empty, Game.empty, Game.empty, Game.empty },
-		// { Game.empty, Game.empty, Game.empty, Game.empty, Game.blackpiece,
-		// Game.empty, Game.empty, Game.empty,
-		// Game.empty, Game.whitepiece, Game.empty, Game.empty },
-		// { Game.empty, Game.blackpiece, Game.empty, Game.empty, Game.empty,
-		// Game.empty, Game.whitepiece,
-		// Game.empty, Game.empty, Game.empty, Game.empty, Game.blackpiece },
-		// { Game.empty, Game.empty, Game.empty, Game.whitepiece, Game.empty,
-		// Game.empty, Game.empty, Game.empty,
-		// Game.blackpiece, Game.empty, Game.empty, Game.empty } };
-
-		board.board = board2;
-
-		// Board board = new Board(12);
-		board.printBoard();
-
-		System.out.println("longest chain = " + board.getLongestChain(new Point(0, 0), Game.blackpiece));
-
-		// board.setPiece(1, 2, Game.blackpiece);
-		// board.printBoard();
-
-		// for (int y = 0; y < board.getBoardSize(); y++)
-		// for (int x = 0; x < board.getBoardSize(); x++) {
-		// board.setPiece(x, y, Game.blackpiece);
-		// board.printBoard();
-		// }
-
-	}
-
+	/**
+	 * Gets a piece.
+	 *
+	 * @param coordX the coord X
+	 * @param coordY the coord Y
+	 * @return the piece
+	 */
 	public byte getPiece(int coordX, int coordY) {
 		return board[coordY][coordX];
 	}
 
+	/**
+	 * Sets a piece.
+	 *
+	 * @param coordX the coord X
+	 * @param coordY the coord Y
+	 * @param piece the piece
+	 */
 	public void setPiece(int coordX, int coordY, byte piece) {
 		board[coordY][coordX] = piece;
 	}
 
+	/**
+	 * Gets a piece.
+	 *
+	 * @param coords the coords
+	 * @return the piece
+	 */
 	public byte getPiece(Point coords) {
 		return board[coords.y][coords.x]; 
 	}
 
+	/**
+	 * Sets a piece.
+	 *
+	 * @param coords the coords
+	 * @param piece the piece
+	 */
 	public void setPiece(Point coords, byte piece) {
 		board[coords.y][coords.x] = piece;
 	}
 
+	/**
+	 * Initialize board with empty spaces.
+	 */
 	private void initializeBoardWithEmpty() {
 		for (byte[] row : board)
 			Arrays.fill(row, Game.empty);
 	}
 
+	/**
+	 * Initialize board.
+	 */
 	private void initializeBoard() {
 		initializeBoardWithEmpty();
 
@@ -154,6 +114,13 @@ public class Board {
 		}
 	}
 
+	/**
+	 * Initialize row.
+	 *
+	 * @param rowIndex the row index
+	 * @param position the position
+	 * @param piece the piece
+	 */
 	private void initializeRow(int rowIndex, int position, byte piece) {
 
 		byte pieceToPlace = piece;
@@ -164,6 +131,12 @@ public class Board {
 
 	}
 
+	/**
+	 * Gets the opposite piece.
+	 *
+	 * @param piece the piece
+	 * @return the opposite piece
+	 */
 	public static byte getOppositePiece(byte piece) {
 		if (piece == Game.whitepiece)
 			return Game.blackpiece;
@@ -171,15 +144,35 @@ public class Board {
 			return Game.whitepiece;
 	}
 
+	/**
+	 * Gets the board size.
+	 *
+	 * @return the board size
+	 */
 	public int getBoardSize() {
 		return boardSize;
 	}
 
+	/**
+	 * Gets the longest chain.
+	 *
+	 * @param coords1 the first piece coords
+	 * @param coords2 the second piece coords
+	 * @param peca the piece
+	 * @return the longest chain
+	 */
 	public int getLongestChain(Point coords1, Point coords2, byte peca) {
 		
 		return Math.max(getLongestChain(coords1, peca), getLongestChain(coords2, peca));
 	}
 
+	/**
+	 * Gets the longest chain.
+	 *
+	 * @param coords the coords
+	 * @param peca the piece
+	 * @return the longest chain
+	 */
 	public int getLongestChain(Point coords, byte peca) {
 
 		boolean[][] matrixSteppedOn = new boolean[boardSize][boardSize];
@@ -266,6 +259,12 @@ public class Board {
 		return (Game.blackpiece == peca) ? hdis : vdis;
 	}
 
+	/**
+	 * Checks if it is an empty space.
+	 *
+	 * @param coords the coords
+	 * @return true, if is empty space
+	 */
 	public boolean isEmptySpace(Point coords) {
 		if (getPiece(coords) == Game.empty)
 			return true;
@@ -273,6 +272,13 @@ public class Board {
 			return false;
 	}
 
+	/**
+	 * Checks if it is an empty space.
+	 *
+	 * @param coordX the coord X
+	 * @param coordY the coord Y
+	 * @return true, if is empty space
+	 */
 	public boolean isEmptySpace(int coordX, int coordY) {
 		if (getPiece(coordX, coordY) == Game.empty)
 			return true;
@@ -280,6 +286,13 @@ public class Board {
 			return false;
 	}
 
+	/**
+	 * Check if it is a valid play.
+	 *
+	 * @param coords the coords
+	 * @param peca the piece
+	 * @return true, if successful
+	 */
 	public boolean validPlay(Point coords, byte peca) {
 		int[] auxs = { -1, 1 };
 
@@ -306,6 +319,14 @@ public class Board {
 
 	}
 
+	/**
+	 * Check if it is a valid play.
+	 *
+	 * @param coords1 the first piece coords
+	 * @param coords2 the second piece coords
+	 * @param peca the piece
+	 * @return true, if successful
+	 */
 	public boolean validPlay(Point coords1, Point coords2, byte peca) {
 
 		if (!isEmptySpace(coords1) || !isEmptySpace(coords2)) {
@@ -328,16 +349,6 @@ public class Board {
 		setPiece(coords2, oldPiece2);
 
 		return isValidPlay;
-	}
-
-	public boolean gameOver() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public int evaluate(byte maximizingPiece) {
-		// TODO Auto-generated method stub
-		return 0;
 	}
 
 }

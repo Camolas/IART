@@ -1,55 +1,47 @@
 package logic;
 
 import java.awt.Point;
-import java.util.Stack;
 
+/**
+ * The Class Minimax.
+ */
 public class Minimax {
 
+	/** The Constant MAX_INT. */
 	private static final int MAX_INT = Integer.MAX_VALUE;
 
+	/** The board. */
 	private Board board = null;
 	
+	/** The maximizing piece. */
 	private byte maximizingPiece;
+	
+	/** The minimizing piece. */
 	private byte minimizingPiece;
 
+	/** The maximizer biggest chain. */
 	private int biggestChainMax;
+	
+	/** The minimizer biggest chain. */
 	private int biggestChainMin;
 	
+	/** True if game is over. */
 	private boolean endgame = false;
 
+	/** The first piece the algorithm choose. */
 	public Point lastPlayPiece1 = null;
+	
+	/** The first piece the algorithm choose. */
 	public Point lastPlayPiece2 = null;
 
-	@Deprecated
-	public static Stack<Integer[]> applyMinimax() {
-		// just for testing
-		Board boardTest = new Board(Game.boardsize);
-		int biggestChainMaxTest = 1;
-		int biggestChainMinTest = 1;
 
-		int i = 0;
-		
-		byte piece;
-		Minimax minMaxTest = null;
-		int lgchain = 0;
-		while (lgchain != Game.boardsize) {
-			
-			piece = ((i++ % 2) ==0) ?Game.blackpiece:Game.whitepiece;
-			
-			minMaxTest = new Minimax(boardTest, piece);
-			Node a = minMaxTest.applyAlphaBeta();
-			
-			boardTest.setPiece(minMaxTest.lastPlayPiece1, piece);
-			boardTest.setPiece(minMaxTest.lastPlayPiece2, piece);
-			boardTest.printBoard();
 
-			lgchain = boardTest.getLongestChain(minMaxTest.lastPlayPiece1, minMaxTest.lastPlayPiece2, piece);
-		}
-		return null;
-		
-
-	}
-
+	/**
+	 * Instantiates a new minimax.
+	 *
+	 * @param board the board
+	 * @param maximizingPiece the maximizing piece
+	 */
 	public Minimax(Board board, byte maximizingPiece) {
 		this.board = board;
 		this.maximizingPiece = maximizingPiece;
@@ -61,11 +53,28 @@ public class Minimax {
 
 	}
 
+	/**
+	 * Apply alpha beta minimax algorithm auxiliary function.
+	 *
+	 * @return the node
+	 */
 	public Node applyAlphaBeta() {
 		return alphabeta(board, Game.depth, -MAX_INT, MAX_INT, true, 1, 1);
 
 	}
 
+	/**
+	 * Apply alpha beta minimax algorithm.
+	 *
+	 * @param board the board
+	 * @param depth the depth
+	 * @param alfa the alfa
+	 * @param beta the beta
+	 * @param maximizingPlayer the maximizing player
+	 * @param biggestChainMax the maximizer biggest chain 
+	 * @param biggestChainMin the minimizer biggest chain 
+	 * @return the node
+	 */
 	public Node alphabeta(Board board, int depth, int alfa, int beta, boolean maximizingPlayer, int biggestChainMax,
 			int biggestChainMin) {
 		if ((depth == 0) || (biggestChainMax == board.getBoardSize()) || (biggestChainMin == board.getBoardSize())) {
@@ -85,6 +94,14 @@ public class Minimax {
 		return value;
 	}
 
+	/**
+	 * Evaluate Node.
+	 *
+	 * @param board the board
+	 * @param biggestChainMax the maximizer biggest chain 
+	 * @param biggestChainMin the minimizer biggest chain 
+	 * @return the value of the node
+	 */
 	private int evaluate(Board board, int biggestChainMax, int biggestChainMin) {
 		if (biggestChainMax == board.getBoardSize())
 			return biggestChainMax* 10000;
@@ -98,6 +115,17 @@ public class Minimax {
 
 	}
 
+	/**
+	 * Minimize.
+	 *
+	 * @param board the board
+	 * @param depth the depth
+	 * @param alfa the alfa
+	 * @param beta the beta
+	 * @param biggestChainMax the maximizer biggest chain 
+	 * @param biggestChainMin the minimizer biggest chain 
+	 * @return the node
+	 */
 	private Node minimize(Board board, int depth, int alfa, int beta, int biggestChainMax, int biggestChainMin) {
 		Node node = new Node(+MAX_INT, biggestChainMax, biggestChainMin);
 
@@ -143,6 +171,17 @@ public class Minimax {
 
 	}
 
+	/**
+	 * Maximize.
+	 *
+	 * @param board the board
+	 * @param depth the depth
+	 * @param alfa the alfa
+	 * @param beta the beta
+	 * @param biggestChainMax the maximizer biggest chain 
+	 * @param biggestChainMin the minimizer biggest chain 
+	 * @return the node
+	 */
 	private Node maximize(Board board, int depth, int alfa, int beta, int biggestChainMax, int biggestChainMin) {
 		Node node = new Node(-MAX_INT, biggestChainMax, biggestChainMin);
 		// Point[] lastPlayAux = new Point[2];
