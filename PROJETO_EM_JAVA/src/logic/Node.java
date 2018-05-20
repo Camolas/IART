@@ -11,6 +11,7 @@ public class Node {
 		this.biggestChainMin = biggestChainMin;
 	}
 
+	@Deprecated
 	public static void main(String[] args) {
 		int i=0;
 
