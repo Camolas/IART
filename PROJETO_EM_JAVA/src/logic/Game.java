@@ -20,7 +20,7 @@ public class Game {
 	public static int boardsize = 8;
 
 	/** The depth of minimax tree. */
-	public static int depth = 3;
+	public static int depth = 2;
 
 	/** The minimax. */
 	private Minimax minimax = null;

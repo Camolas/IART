@@ -213,15 +213,31 @@ public class GUI {
 		int i = 0;
 		byte playPiece;
 		Point[] play = null;
+		long waitingTime = 750; //ms
 		do {
 
 			playPiece = ((i++ % 2) == 0) ? Game.blackpiece : Game.whitepiece;
 
+			long cl = System.currentTimeMillis();
+			
 			play = game.getPlay(playPiece);
+			
+			try {
+				long deltaT = cl - System.currentTimeMillis();
+				if(waitingTime > deltaT) {
+					waitingTime = waitingTime - deltaT;
+					Thread.sleep(waitingTime);
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 
+			System.out.println("time " + (cl - System.currentTimeMillis()));
+			
 			board[play[0].y][play[0].x] = "" + (char) playPiece;
 			board[play[1].y][play[1].x] = "" + (char) playPiece;
-
+			game.getBoard().printBoard();
+			
 			updateTableModel();
 		} while (!game.checkEndGame(play[0], play[1], playPiece));
 	}

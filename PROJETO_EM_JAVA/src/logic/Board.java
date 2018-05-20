@@ -12,7 +12,7 @@ public class Board {
 	/** The board. */
 	public byte[][] board;
 
-	/** The board size. */
+	/** The board size.*/
 	private int boardSize;
 
 	/**
