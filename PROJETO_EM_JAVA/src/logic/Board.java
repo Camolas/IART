@@ -124,7 +124,7 @@ public class Board {
 	}
 
 	public byte getPiece(Point coords) {
-		return board[coords.y][coords.x];
+		return board[coords.y][coords.x]; 
 	}
 
 	public void setPiece(Point coords, byte piece) {

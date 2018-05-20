@@ -33,7 +33,6 @@ public class Game {
 	}
 
 	public Point[] getPlay(byte piece) {
-		
 		minimax = new Minimax2(board, piece);
 		minimax.applyAlphaBeta();
 

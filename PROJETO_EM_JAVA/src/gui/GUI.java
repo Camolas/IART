@@ -29,6 +29,10 @@ import java.awt.BorderLayout;
 
 public class GUI {
 
+	private static int prevBoardSize;
+	
+	private static DefaultTableModel tabelModel = null; 
+	
 	private static JTable tabel = null; 
 	
 	private static JFrame boardFrame = null;
@@ -47,9 +51,22 @@ public class GUI {
 	
 	private static JSlider sliderDepth;
 	
-	 private static DefaultTableCellRenderer getRenderer() {
-	        return new DefaultTableCellRenderer(){
-	            @Override
+	private static int COLWIDTH = 50;
+	
+	private static Thread gameThread = null; 
+	
+	private static byte bluePiece = '?';
+	
+	private static DefaultTableCellRenderer rendered = null;
+	private static DefaultTableCellRenderer getRenderer() {
+		if(rendered==null) {
+			rendered = new DefaultTableCellRenderer(){
+	            /**
+				 * 
+				 */
+				private static final long serialVersionUID = 1L;
+
+				@Override
 	            public Component getTableCellRendererComponent(JTable table,
 	                    Object value, boolean isSelected, boolean hasFocus,
 	                    int row, int column) {
@@ -60,49 +77,55 @@ public class GUI {
 	                } else  if("0".equals(value)){
 	                    tableCellRendererComponent.setBackground(Color.BLACK);
 	                    tableCellRendererComponent.setForeground(Color.BLACK);
+	                } else  if("?".equals(value)){
+	                    tableCellRendererComponent.setBackground(Color.LIGHT_GRAY);
+	                    tableCellRendererComponent.setForeground(Color.LIGHT_GRAY);
 	                } else {
 	                    tableCellRendererComponent.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
 	                }
 	                return tableCellRendererComponent;
 	            }
 	        };
-	    }
+		}
+		return rendered;
+	}
 
 
 
 	private static void pvp() {
 		restartGame();
-		
-		
+
 		int i = 0;
 		byte playPiece;
 		Point[] play = null;
 		do{
 
-			
 			if((i++%2)==0)
 				playPiece = Game.blackpiece;
 			else
 				playPiece = Game.whitepiece;
 			
+			boolean cont;
 			do{
 				System.out.println("Try a valid play!");
-				play = getCoords();					
-			}while(!game.getBoard().validPlay(play[0],play[1], playPiece));
+				
+				play = getCoords();
+				cont = !game.getBoard().validPlay(play[0],play[1], playPiece);
+				if(cont) {
+		        	board[play[0].y][play[0].x] = ""; 	
+		        	board[play[1].y][play[1].x] = "";
+		        	updateTableModel();
+				}
+			}while(cont);
+			System.out.flush();
+			
 			game.setPieces(playPiece, play[0], play[1]);
 				
         	board[play[0].y][play[0].x] = ""+(char)playPiece; 	
         	board[play[1].y][play[1].x] = ""+(char)playPiece;
-        	
-			boardPanel.getComponent(0).repaint();
-			boardPanel.getComponent(1).repaint();
-			boardPanel.repaint();
-			boardFrame.repaint();
-			
+
+	        updateTableModel();
 		}while(!game.checkEndGame(play[0], play[1], playPiece));
-		
-		boardPanel.repaint();
-		boardFrame.repaint();
 	}
 
 
@@ -117,10 +140,19 @@ public class GUI {
 			
 			if((i++%2)==0){
 				playPiece = Game.blackpiece;
+				boolean cont;
 				do{
 					System.out.println("Try a valid play!");
-					play = getCoords();					
-				}while(!game.getBoard().validPlay(play[0],play[1], playPiece));
+					
+					play = getCoords();
+					cont = !game.getBoard().validPlay(play[0],play[1], playPiece);
+					if(cont) {
+						board[play[0].y][play[0].x] = ""; 	 
+						board[play[1].y][play[1].x] = "";
+			        	updateTableModel();
+					}
+				}while(cont);
+				
 				game.setPieces(playPiece, play[0], play[1]);
 			}
 			else{
@@ -128,18 +160,14 @@ public class GUI {
 				play = game.getPlay(playPiece);
 			}
 			
-        	board[play[0].y][play[0].x] = ""+(char)playPiece; 	
-        	board[play[1].y][play[1].x] = ""+(char)playPiece;
-        	
-			boardPanel.getComponent(0).repaint();
-			boardPanel.getComponent(1).repaint();
-			boardPanel.repaint();
-			boardFrame.repaint();
-			
+			final Point[] fplay = play;
+			final byte fplayPiece = playPiece;
+
+           	board[fplay[0].y][fplay[0].x] = ""+(char)fplayPiece; 	
+           	board[fplay[1].y][fplay[1].x] = ""+(char)fplayPiece;
+           	
+	        updateTableModel();
 		}while(!game.checkEndGame(play[0], play[1], playPiece));
-		
-		boardPanel.repaint();
-		boardFrame.repaint();
 	}
 		
 	private static Point[] getCoords() {
@@ -151,8 +179,6 @@ public class GUI {
 		return new Point[]{new Point(playPos[0][0],playPos[0][1]),new Point(playPos[1][0],playPos[1][1])};
 	}
 
-
-
 	private static void aivsai(){
 		restartGame();
 		
@@ -161,14 +187,6 @@ public class GUI {
 		byte playPiece;
 		Point[] play = null;
 		do{
-
-			
-			try {
-				Thread.sleep(2000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 			
 			playPiece = ((i++%2)==0)?Game.blackpiece:Game.whitepiece;
 			
@@ -176,25 +194,18 @@ public class GUI {
 			
         	board[play[0].y][play[0].x] = ""+(char)playPiece; 	
         	board[play[1].y][play[1].x] = ""+(char)playPiece;
-        	
-			boardPanel.getComponent(0).repaint();
-			boardPanel.getComponent(1).repaint();
-			boardPanel.repaint();
-			boardFrame.repaint();
-			
+
+	        updateTableModel();
 		}while(!game.checkEndGame(play[0], play[1], playPiece));
-		
-		boardPanel.repaint();
-		boardFrame.repaint();
-		
 	}
 	
 	private static void showMenu() {
         //Create and set up the window.
         JFrame menuFrame = new JFrame("MenuFrame");
         menuFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        menuFrame.setSize(514, 510);
         menuFrame.setLocationRelativeTo(null);
-        menuFrame.pack();
+        menuFrame.pack(); 
         menuFrame.setSize(514, 510);
         
         JPanel buttonPanel = new JPanel();
@@ -209,30 +220,28 @@ public class GUI {
         
         buttonPanel.add(playervsplayerButton, "flowx,cell 0 1 2 1,alignx center,growy" );
         
-                playervsplayerButton.setSize(new Dimension(540, 540));
-                
-                playervsplayerButton.addActionListener(new ActionListener(){
+        playervsplayerButton.setSize(new Dimension(540, 540));
+        
+        playervsplayerButton.addActionListener(new ActionListener(){
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				cleanBoard();
 				menuFrame.setVisible(false);
 				boardFrame.setVisible(true);
-				Thread thread = new Thread(new Runnable() {
+				gameThread = new Thread(new Runnable() {
 		            public void run() {
 		            	pvp();
 		            }
 		        });
-				thread.start();
+				gameThread.start();
 			}        	
-                });
+        });
         
 
         boardFrame = new JFrame("BoardFrame");
         boardFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         boardFrame.setLocationRelativeTo(null);
-        boardFrame.pack();
-        boardFrame.setSize(540, 600);
         
         boardPanel = new JPanel();
         boardPanel.setLayout(new BoxLayout(boardPanel, BoxLayout.PAGE_AXIS));
@@ -246,20 +255,13 @@ public class GUI {
         	columns[i] = i + "";
         }
         
-        
-        tabel = new  JTable(board,columns);
+
+        tabelModel = new DefaultTableModel(board, columns);
+        tabel = new JTable(tabelModel);
         tabel.setBackground(new Color(222,184,135));
-        tabel.setRowHeight(40);
+        tabel.setRowHeight(COLWIDTH);
         tabel.setRowSelectionAllowed(false);
-        
         tabel.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        
-        for(TableColumn cl :Collections.list(tabel.getColumnModel().getColumns())){
-        	cl.setPreferredWidth(25);
-        	cl.setCellRenderer(getRenderer());
-        }
-        tabel.updateUI();
-        tabel.repaint();
         
         JButton backToMenu = new JButton("Back to Menu");
         backToMenu.setSize(new Dimension(250, 100));
@@ -268,12 +270,6 @@ public class GUI {
         boardPanel.add(tabel);
         boardPanel.add(Box.createRigidArea(new Dimension(0,25)));
         boardPanel.add(backToMenu);
-
-        for (int c = 0; c < tabel.getColumnCount(); c++)
-        {
-            Class<?> col_class = tabel.getColumnClass(c);
-            tabel.setDefaultEditor(col_class, null);        // remove editor
-        }
         
         tabel.addMouseListener(new MouseAdapter() {
         	  public void mouseClicked(MouseEvent e) {
@@ -283,9 +279,15 @@ public class GUI {
         	      int column = target.getSelectedColumn();
         	      
         	      if(clickCount<2){
+        	    	  if(!board[row][column].equals(""+(char)Game.empty) && !board[row][column].equals("")) {
+        	    		  System.out.println("Returned ITS: '" + board[row][column] + "'");
+        	    		  return;
+        	    	  }
+        	    	  
         	    	  System.out.println(column+":" + row);
         	    	  playPos[clickCount++] = new Integer[]{column, row};
-        	    	
+        	    	  board[row][column] = ""+(char)bluePiece;
+        		      updateTableModel();
         	      }
 
         	    }
@@ -305,12 +307,12 @@ public class GUI {
 				cleanBoard();
 				menuFrame.setVisible(false);
 				boardFrame.setVisible(true);
-				Thread thread = new Thread(new Runnable() {
+				gameThread = new Thread(new Runnable() {
 		            public void run() {
 		            	pvsai();
 		            }
 		        });
-				thread.start();
+				gameThread.start();
 			}        	
         });
         
@@ -325,6 +327,7 @@ public class GUI {
         sliderSizeBoard.setPaintLabels(true);
         sliderSizeBoard.setMajorTickSpacing(2);
         sliderSizeBoard.setMinorTickSpacing(1);
+        sliderSizeBoard.setValue(Game.boardsize);
         buttonPanel.add(sliderSizeBoard, "cell 1 4,grow");
         
         JLabel lblDepth = new JLabel("Depth");
@@ -338,53 +341,69 @@ public class GUI {
         sliderDepth.setPaintLabels(true);
         sliderDepth.setMajorTickSpacing(1);
         sliderDepth.setMinorTickSpacing(1);
+        sliderDepth.setValue(Game.depth);
         buttonPanel.add(sliderDepth, "cell 1 5,grow");
         
-               //Add the ubiquitous "Hello World" label.
-               JButton aivsaiButton = new JButton("AI vs AI");
-               
-               aivsaiButton.setMinimumSize(new Dimension(250, 100));
-               
-               aivsaiButton.setPreferredSize(new Dimension(250, 100));
-               buttonPanel.add(aivsaiButton, "cell 0 3 2 1,alignx center,growy" );
-               
-               aivsaiButton.addActionListener(new ActionListener(){
-
+       //Add the ubiquitous "Hello World" label.
+       JButton aivsaiButton = new JButton("AI vs AI");
+       
+       aivsaiButton.setMinimumSize(new Dimension(250, 100));
+       
+       aivsaiButton.setPreferredSize(new Dimension(250, 100));
+       buttonPanel.add(aivsaiButton, "cell 0 3 2 1,alignx center,growy" );
+       
+       aivsaiButton.addActionListener(new ActionListener(){
 			@Override
-			public void actionPerformed(ActionEvent arg0) {
+			public void actionPerformed(ActionEvent arg0) { 
 				cleanBoard();
 				menuFrame.setVisible(false);
 				boardFrame.setVisible(true);
-				Thread thread = new Thread(new Runnable() {
+				gameThread = new Thread(new Runnable() {
 		            public void run() {
 		            	aivsai();
 		            }
 		        });
-				thread.start();
+				gameThread.start();
 			}        	
-               });
-        boardFrame.getContentPane().add(boardPanel);
+       });
+       boardFrame.getContentPane().add(boardPanel);
  
-        //Display the window.
-        menuFrame.setVisible(true);
-        boardFrame.setVisible(false);
+       //Display the window.
+       menuFrame.setVisible(true);
+       boardFrame.setVisible(false);
         
         
-        backToMenu.addActionListener(new ActionListener(){
+       backToMenu.addActionListener(new ActionListener(){
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				try {
+					gameThread.stop(); //Not safe but must be used otherwise we would have to code logic inside minimax algorithm to check if interrupt was called.
+				}catch(Exception ee) {
+					System.out.println("Closed game");
+				}
 				menuFrame.setVisible(true);
 				boardFrame.setVisible(false);
 			}
-        	
-        });
+       	
+       });
     }
 	
-	private static void cleanBoard(){
+	private static int getBoardFrameSize() {
+		return COLWIDTH * Game.boardsize;
+	}
 
+
+	private static String[] columns; 
+	
+	private static void cleanBoard(){
 		game.resetBoard();
 		Board boardOri = game.getBoard();
+
+		if(Game.boardsize!=prevBoardSize) {
+			prevBoardSize = Game.boardsize;
+			createTablePar();
+		}
 		
 		for(int i = 0; i < Game.boardsize; i++){
 			board[i] = new String[Game.boardsize];
@@ -393,16 +412,50 @@ public class GUI {
 				board[i][j] = "" + ch;
 			}
 		}
+		updateTableModel();
+        boardFrame.setSize(getBoardFrameSize(), 600);
+        tabel.updateUI();
+        tabel.repaint();
+	}
+	
+	private static void createTablePar(){
+
+		board = new String[Game.boardsize][Game.boardsize]; 	
+		
+		columns = new String[Game.boardsize];
+        
+        for(int i = 0; i < Game.boardsize; i++){
+        	columns[i] = i + "";
+        }
+	}
+	
+	private static void updateTableModel(){
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+            	tabelModel.setDataVector(board, columns);
+        		
+        		for(TableColumn cl :Collections.list(tabel.getColumnModel().getColumns())){
+                	cl.setPreferredWidth(COLWIDTH);
+                	cl.setCellRenderer(getRenderer());
+                }
+
+                for (int c = 0; c < tabel.getColumnCount(); c++)
+                {
+                    Class<?> col_class = tabel.getColumnClass(c);
+                    tabel.setDefaultEditor(col_class, null);        // remove editor
+                }
+            }
+        });
 	}
  
     public static void main(String[] args) {
 		
     	game = new Game();
 
+    	prevBoardSize = -1;
+    	
 		board = new String[Game.boardsize][Game.boardsize]; 
-		
-		cleanBoard();
-		
+
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
             	showMenu();
@@ -412,16 +465,14 @@ public class GUI {
     }
     
     public static void restartGame(){
-    	//setGameBoardSize();
+    	setGameBoardSize();
     	setGameDepth();
-    	
-    	game.resetBoard();
-    	
-
+		
 		cleanBoard();
     }
     
     public static void setGameBoardSize(){
+    	
     	Game.boardsize = sliderSizeBoard.getValue();
     }
     
