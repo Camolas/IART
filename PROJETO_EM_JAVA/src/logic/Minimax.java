@@ -19,15 +19,6 @@ public class Minimax {
 	/** The minimizing piece. */
 	private byte minimizingPiece;
 
-	/** The maximizer biggest chain. */
-	private int biggestChainMax;
-	
-	/** The minimizer biggest chain. */
-	private int biggestChainMin;
-	
-	/** True if game is over. */
-	private boolean endgame = false;
-
 	/** The first piece the algorithm choose. */
 	public Point lastPlayPiece1 = null;
 	
@@ -214,7 +205,6 @@ public class Minimax {
 						if(depth == Game.depth && board.getLongestChain(new Point(x1, y1), new Point(x2, y2), maximizingPiece) == board.getBoardSize()){
 							lastPlayPiece1 = new Point(x1, y1);
 							lastPlayPiece2 = new Point(x2, y2);
-							this.endgame = true;
 							return node;
 						}
 							
@@ -229,10 +219,7 @@ public class Minimax {
 							if(depth == Game.depth){
 								lastPlayPiece1 = new Point(x1, y1);
 								lastPlayPiece2 = new Point(x2, y2);
-								int boardsize = board.getBoardSize();
-								if(node.value == boardsize)
-									this.endgame = true;
-									
+																
 							}
 						}
 

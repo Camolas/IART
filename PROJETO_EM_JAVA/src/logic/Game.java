@@ -1,8 +1,6 @@
 package logic;
 
 import java.awt.Point;
-import java.util.Random;
-import java.util.Stack;
 
 /**
  * The Class Game.
