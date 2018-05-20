@@ -16,7 +16,7 @@ public class Game {
 	
 	public static int depth = 3;
 
-	private Minimax2 minimax = null;
+	private Minimax minimax = null;
 	
 	private Board board = null;
 	
@@ -33,7 +33,7 @@ public class Game {
 	}
 
 	public Point[] getPlay(byte piece) {
-		minimax = new Minimax2(board, piece);
+		minimax = new Minimax(board, piece);
 		minimax.applyAlphaBeta();
 
 		setPieces(piece, minimax.lastPlayPiece1, minimax.lastPlayPiece2);

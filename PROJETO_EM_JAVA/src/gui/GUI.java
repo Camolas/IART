@@ -51,7 +51,7 @@ public class GUI {
 	
 	private static JSlider sliderDepth;
 	
-	private static int COLWIDTH = 50;
+	private static int COLWIDTH = 35;
 	
 	private static Thread gameThread = null; 
 	
@@ -378,7 +378,7 @@ public class GUI {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					gameThread.stop(); //Not safe but must be used otherwise we would have to code logic inside minimax algorithm to check if interrupt was called.
+					gameThread.stop(); //Not safe but must be used otherwise we would have to code logic inside minimax algorithm to check if an interrupt was called.
 				}catch(Exception ee) {
 					System.out.println("Closed game");
 				}
