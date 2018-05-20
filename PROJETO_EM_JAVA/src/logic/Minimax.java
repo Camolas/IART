@@ -12,26 +12,26 @@ public class Minimax {
 
 	/** The board. */
 	private Board board = null;
-	
+
 	/** The maximizing piece. */
 	private byte maximizingPiece;
-	
+
 	/** The minimizing piece. */
 	private byte minimizingPiece;
 
 	/** The first piece the algorithm choose. */
 	public Point lastPlayPiece1 = null;
-	
+
 	/** The first piece the algorithm choose. */
 	public Point lastPlayPiece2 = null;
-
-
 
 	/**
 	 * Instantiates a new minimax.
 	 *
-	 * @param board the board
-	 * @param maximizingPiece the maximizing piece
+	 * @param board
+	 *            the board
+	 * @param maximizingPiece
+	 *            the maximizing piece
 	 */
 	public Minimax(Board board, byte maximizingPiece) {
 		this.board = board;
@@ -57,13 +57,20 @@ public class Minimax {
 	/**
 	 * Apply alpha beta minimax algorithm.
 	 *
-	 * @param board the board
-	 * @param depth the depth
-	 * @param alfa the alfa
-	 * @param beta the beta
-	 * @param maximizingPlayer the maximizing player
-	 * @param biggestChainMax the maximizer biggest chain 
-	 * @param biggestChainMin the minimizer biggest chain 
+	 * @param board
+	 *            the board
+	 * @param depth
+	 *            the depth
+	 * @param alfa
+	 *            the alfa
+	 * @param beta
+	 *            the beta
+	 * @param maximizingPlayer
+	 *            the maximizing player
+	 * @param biggestChainMax
+	 *            the maximizer biggest chain
+	 * @param biggestChainMin
+	 *            the minimizer biggest chain
 	 * @return the node
 	 */
 	public Node alphabeta(Board board, int depth, int alfa, int beta, boolean maximizingPlayer, int biggestChainMax,
@@ -81,24 +88,27 @@ public class Minimax {
 			value = minimize(board, depth, alfa, beta, biggestChainMax, biggestChainMin);
 
 		}
-		
+
 		return value;
 	}
 
 	/**
 	 * Evaluate Node.
 	 *
-	 * @param board the board
-	 * @param biggestChainMax the maximizer biggest chain 
-	 * @param biggestChainMin the minimizer biggest chain 
+	 * @param board
+	 *            the board
+	 * @param biggestChainMax
+	 *            the maximizer biggest chain
+	 * @param biggestChainMin
+	 *            the minimizer biggest chain
 	 * @return the value of the node
 	 */
 	private int evaluate(Board board, int biggestChainMax, int biggestChainMin) {
 		if (biggestChainMax == board.getBoardSize())
-			return biggestChainMax* 10000;
+			return biggestChainMax * 10000;
 
 		if (biggestChainMin == board.getBoardSize())
-			return -biggestChainMin* 10000;
+			return -biggestChainMin * 10000;
 
 		return biggestChainMax * 10000 + (biggestChainMax - biggestChainMin + board.getBoardSize()) * 100
 				+ (-biggestChainMin + board.getBoardSize());
@@ -109,12 +119,18 @@ public class Minimax {
 	/**
 	 * Minimize.
 	 *
-	 * @param board the board
-	 * @param depth the depth
-	 * @param alfa the alfa
-	 * @param beta the beta
-	 * @param biggestChainMax the maximizer biggest chain 
-	 * @param biggestChainMin the minimizer biggest chain 
+	 * @param board
+	 *            the board
+	 * @param depth
+	 *            the depth
+	 * @param alfa
+	 *            the alfa
+	 * @param beta
+	 *            the beta
+	 * @param biggestChainMax
+	 *            the maximizer biggest chain
+	 * @param biggestChainMin
+	 *            the minimizer biggest chain
 	 * @return the node
 	 */
 	private Node minimize(Board board, int depth, int alfa, int beta, int biggestChainMax, int biggestChainMin) {
@@ -126,12 +142,12 @@ public class Minimax {
 					continue;
 
 				innerloop: for (int x2 = 0; x2 < Game.boardsize; x2++)
-					for (int y2 = y1+1; y2 < Game.boardsize; y2++) {
+					for (int y2 = y1 + 1; y2 < Game.boardsize; y2++) {
 
-						if(x1 == x2 && y2 < y1)
+						if (x1 == x2 && y2 < y1)
 							continue;
-						
-						if(x2<x1)
+
+						if (x2 < x1)
 							continue innerloop;
 
 						if (!board.validPlay(new Point(x1, y1), new Point(x2, y2), minimizingPiece))
@@ -165,12 +181,18 @@ public class Minimax {
 	/**
 	 * Maximize.
 	 *
-	 * @param board the board
-	 * @param depth the depth
-	 * @param alfa the alfa
-	 * @param beta the beta
-	 * @param biggestChainMax the maximizer biggest chain 
-	 * @param biggestChainMin the minimizer biggest chain 
+	 * @param board
+	 *            the board
+	 * @param depth
+	 *            the depth
+	 * @param alfa
+	 *            the alfa
+	 * @param beta
+	 *            the beta
+	 * @param biggestChainMax
+	 *            the maximizer biggest chain
+	 * @param biggestChainMin
+	 *            the minimizer biggest chain
 	 * @return the node
 	 */
 	private Node maximize(Board board, int depth, int alfa, int beta, int biggestChainMax, int biggestChainMin) {
@@ -185,11 +207,10 @@ public class Minimax {
 				innerloop: for (int x2 = 0; x2 < Game.boardsize; x2++)
 					for (int y2 = 0; y2 < Game.boardsize; y2++) {
 
-
-						if(x1 == x2 && y2 < y1)
+						if (x1 == x2 && y2 < y1)
 							continue;
-						
-						if(x2<x1)
+
+						if (x2 < x1)
 							continue innerloop;
 
 						if (!board.validPlay(new Point(x1, y1), new Point(x2, y2), maximizingPiece))
@@ -200,26 +221,24 @@ public class Minimax {
 
 						node.biggestChainMax = Math.max(biggestChainMax,
 								board.getLongestChain(new Point(x1, y1), new Point(x2, y2), maximizingPiece));
-						
-						//Temporary but perfect
-						if(depth == Game.depth && board.getLongestChain(new Point(x1, y1), new Point(x2, y2), maximizingPiece) == board.getBoardSize()){
+
+						// Temporary but perfect
+						if (depth == Game.depth && board.getLongestChain(new Point(x1, y1), new Point(x2, y2),
+								maximizingPiece) == board.getBoardSize()) {
 							lastPlayPiece1 = new Point(x1, y1);
 							lastPlayPiece2 = new Point(x2, y2);
 							return node;
 						}
-							
-						
-					
 
 						int currValNode = alphabeta(board, depth - 1, alfa, beta, false, node.biggestChainMax,
 								biggestChainMin).value;
-						
+
 						if (currValNode > node.value) {
 							node.value = currValNode;
-							if(depth == Game.depth){
+							if (depth == Game.depth) {
 								lastPlayPiece1 = new Point(x1, y1);
 								lastPlayPiece2 = new Point(x2, y2);
-																
+
 							}
 						}
 
@@ -238,9 +257,9 @@ public class Minimax {
 					}
 
 			}
-		
-		//if(depth == 3)
-		//board.printBoard();
+
+		// if(depth == 3)
+		// board.printBoard();
 
 		return node;
 

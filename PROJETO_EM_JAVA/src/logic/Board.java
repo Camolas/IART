@@ -11,14 +11,15 @@ public class Board {
 
 	/** The board. */
 	public byte[][] board;
-	
+
 	/** The board size. */
 	private int boardSize;
 
 	/**
 	 * Instantiates a new board.
 	 *
-	 * @param boardSize the board size
+	 * @param boardSize
+	 *            the board size
 	 */
 	public Board(int boardSize) {
 
@@ -41,13 +42,13 @@ public class Board {
 		System.out.println();
 	}
 
-	
-
 	/**
 	 * Gets a piece.
 	 *
-	 * @param coordX the coord X
-	 * @param coordY the coord Y
+	 * @param coordX
+	 *            the coord X
+	 * @param coordY
+	 *            the coord Y
 	 * @return the piece
 	 */
 	public byte getPiece(int coordX, int coordY) {
@@ -57,9 +58,12 @@ public class Board {
 	/**
 	 * Sets a piece.
 	 *
-	 * @param coordX the coord X
-	 * @param coordY the coord Y
-	 * @param piece the piece
+	 * @param coordX
+	 *            the coord X
+	 * @param coordY
+	 *            the coord Y
+	 * @param piece
+	 *            the piece
 	 */
 	public void setPiece(int coordX, int coordY, byte piece) {
 		board[coordY][coordX] = piece;
@@ -68,18 +72,21 @@ public class Board {
 	/**
 	 * Gets a piece.
 	 *
-	 * @param coords the coords
+	 * @param coords
+	 *            the coords
 	 * @return the piece
 	 */
 	public byte getPiece(Point coords) {
-		return board[coords.y][coords.x]; 
+		return board[coords.y][coords.x];
 	}
 
 	/**
 	 * Sets a piece.
 	 *
-	 * @param coords the coords
-	 * @param piece the piece
+	 * @param coords
+	 *            the coords
+	 * @param piece
+	 *            the piece
 	 */
 	public void setPiece(Point coords, byte piece) {
 		board[coords.y][coords.x] = piece;
@@ -117,9 +124,12 @@ public class Board {
 	/**
 	 * Initialize row.
 	 *
-	 * @param rowIndex the row index
-	 * @param position the position
-	 * @param piece the piece
+	 * @param rowIndex
+	 *            the row index
+	 * @param position
+	 *            the position
+	 * @param piece
+	 *            the piece
 	 */
 	private void initializeRow(int rowIndex, int position, byte piece) {
 
@@ -134,7 +144,8 @@ public class Board {
 	/**
 	 * Gets the opposite piece.
 	 *
-	 * @param piece the piece
+	 * @param piece
+	 *            the piece
 	 * @return the opposite piece
 	 */
 	public static byte getOppositePiece(byte piece) {
@@ -156,21 +167,26 @@ public class Board {
 	/**
 	 * Gets the longest chain.
 	 *
-	 * @param coords1 the first piece coords
-	 * @param coords2 the second piece coords
-	 * @param peca the piece
+	 * @param coords1
+	 *            the first piece coords
+	 * @param coords2
+	 *            the second piece coords
+	 * @param peca
+	 *            the piece
 	 * @return the longest chain
 	 */
 	public int getLongestChain(Point coords1, Point coords2, byte peca) {
-		
+
 		return Math.max(getLongestChain(coords1, peca), getLongestChain(coords2, peca));
 	}
 
 	/**
 	 * Gets the longest chain.
 	 *
-	 * @param coords the coords
-	 * @param peca the piece
+	 * @param coords
+	 *            the coords
+	 * @param peca
+	 *            the piece
 	 * @return the longest chain
 	 */
 	public int getLongestChain(Point coords, byte peca) {
@@ -262,7 +278,8 @@ public class Board {
 	/**
 	 * Checks if it is an empty space.
 	 *
-	 * @param coords the coords
+	 * @param coords
+	 *            the coords
 	 * @return true, if is empty space
 	 */
 	public boolean isEmptySpace(Point coords) {
@@ -275,8 +292,10 @@ public class Board {
 	/**
 	 * Checks if it is an empty space.
 	 *
-	 * @param coordX the coord X
-	 * @param coordY the coord Y
+	 * @param coordX
+	 *            the coord X
+	 * @param coordY
+	 *            the coord Y
 	 * @return true, if is empty space
 	 */
 	public boolean isEmptySpace(int coordX, int coordY) {
@@ -289,8 +308,10 @@ public class Board {
 	/**
 	 * Check if it is a valid play.
 	 *
-	 * @param coords the coords
-	 * @param peca the piece
+	 * @param coords
+	 *            the coords
+	 * @param peca
+	 *            the piece
 	 * @return true, if successful
 	 */
 	public boolean validPlay(Point coords, byte peca) {
@@ -322,9 +343,12 @@ public class Board {
 	/**
 	 * Check if it is a valid play.
 	 *
-	 * @param coords1 the first piece coords
-	 * @param coords2 the second piece coords
-	 * @param peca the piece
+	 * @param coords1
+	 *            the first piece coords
+	 * @param coords2
+	 *            the second piece coords
+	 * @param peca
+	 *            the piece
 	 * @return true, if successful
 	 */
 	public boolean validPlay(Point coords1, Point coords2, byte peca) {
